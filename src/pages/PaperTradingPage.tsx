@@ -6,6 +6,7 @@ import { StockLogo } from '../components/common/StockLogo';
 import { Sparkline } from '../components/charts/Sparkline';
 import { OrderActionType, OrderExecutionType, StockQuote } from '../types/trading';
 import { formatCurrency, formatPercent } from '../utils/formatters';
+import { getMarketStatus } from '../utils/marketHours';
 
 interface PaperTradingPageProps {
   initialSymbol?: string;
@@ -24,6 +25,15 @@ export const PaperTradingPage: React.FC<PaperTradingPageProps> = ({ initialSymbo
     totalPnLPercent,
     executeOrder,
   } = useTrading();
+
+  const [marketStatus, setMarketStatus] = useState(() => getMarketStatus());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMarketStatus(getMarketStatus());
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [orderAction, setOrderAction] = useState<OrderActionType>('Buy');
@@ -367,8 +377,14 @@ export const PaperTradingPage: React.FC<PaperTradingPageProps> = ({ initialSymbo
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                 Market Overview
               </h4>
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                Live
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                marketStatus.isOpen
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                  : marketStatus.session === 'Pre-Market' || marketStatus.session === 'After-Hours'
+                  ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                  : 'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+              }`}>
+                {marketStatus.statusText}
               </span>
             </div>
 
@@ -394,12 +410,13 @@ export const PaperTradingPage: React.FC<PaperTradingPageProps> = ({ initialSymbo
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-100 dark:border-slate-800 mt-6">
-            <h5 className="text-xs font-bold text-slate-900 dark:text-white mb-2">
-              Trading Notice
-            </h5>
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800 mt-6 space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-900 dark:text-white">NYSE/NASDAQ Hours:</span>
+              <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">{marketStatus.nextEventText}</span>
+            </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-              Paper trading simulations are executed instantly with real-time Finnhub US market prices with zero financial risk.
+              Regular Hours: <strong className="text-slate-700 dark:text-slate-300">{marketStatus.formattedScheduleIST}</strong>.
             </p>
           </div>
         </div>

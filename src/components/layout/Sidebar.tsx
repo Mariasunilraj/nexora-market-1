@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   PieChart,
@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTrading } from '../../context/TradingContext';
+import { getMarketStatus } from '../../utils/marketHours';
 
 export type PageId =
   | 'dashboard'
@@ -42,6 +43,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
 }) => {
   const { buyingPower } = useTrading();
+  const [marketStatus, setMarketStatus] = useState(() => getMarketStatus());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMarketStatus(getMarketStatus());
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
 
   const navItems = [
     { id: 'dashboard' as PageId, label: 'Dashboard', icon: LayoutDashboard },
@@ -160,17 +169,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </p>
           </div>
 
-          {/* Market Status Card matching mockup */}
-          <div className="bg-white dark:bg-[#111C3A] rounded-xl p-3 border border-slate-200/80 dark:border-[#1C2951] flex items-center gap-2.5 shadow-sm">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-            <div>
-              <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                Market Status
-              </p>
-              <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                Open <span className="text-slate-400 font-normal">• US Market</span>
-              </p>
+          {/* Market Status Card matching real US NYSE/NASDAQ trading hours */}
+          <div
+            title={`US Hours: ${marketStatus.formattedScheduleIST}\nNY Time: ${marketStatus.currentTimeNY}\nIST Time: ${marketStatus.currentTimeIST}`}
+            className="bg-white dark:bg-[#111C3A] rounded-xl p-3 border border-slate-200/80 dark:border-[#1C2951] flex items-center justify-between shadow-sm"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                marketStatus.isOpen
+                  ? 'bg-emerald-500 animate-pulse'
+                  : marketStatus.session === 'Pre-Market' || marketStatus.session === 'After-Hours'
+                  ? 'bg-amber-500'
+                  : 'bg-rose-500'
+              }`} />
+              <div>
+                <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                  Market Status
+                </p>
+                <p className={`text-xs font-black ${
+                  marketStatus.isOpen
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : marketStatus.session === 'Pre-Market' || marketStatus.session === 'After-Hours'
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-rose-600 dark:text-rose-400'
+                }`}>
+                  {marketStatus.statusText}
+                  <span className="text-[10px] text-slate-400 font-normal ml-1">• US Market</span>
+                </p>
+              </div>
             </div>
+
+            <span className="text-[10px] font-semibold text-slate-400 whitespace-nowrap">
+              {marketStatus.nextEventText}
+            </span>
           </div>
         </div>
       </aside>
