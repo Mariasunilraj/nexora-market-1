@@ -1,0 +1,27 @@
+# ====================================================================
+# NEXORA Render Blueprint (Infrastructure-as-Code)
+# Deploys High-Process Trading Engine & Microservice
+# ====================================================================
+
+services:
+  - type: web
+    name: nexora-trading-backend
+    runtime: node
+    plan: starter # Or 'free'
+    region: oregon # or frankfurt / singapore
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false # Set in Render Dashboard
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false # Set in Render Dashboard
+      - key: FINNHUB_API_KEY
+        value: da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0

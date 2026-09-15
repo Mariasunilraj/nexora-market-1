@@ -1,0 +1,53 @@
+name: NEXORA Continuous Integration & Deployment Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 1. Frontend Verification Job (Vercel Build Check)
+  frontend-build:
+    name: Frontend Build & Typecheck (Vercel Ready)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Build Frontend for Production
+        run: npm run build
+        env:
+          VITE_FINNHUB_API_KEY: ${{ secrets.VITE_FINNHUB_API_KEY || 'da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0' }}
+
+  # 2. Backend Verification Job (Render Build Check)
+  backend-build:
+    name: Backend Build & Worker Check (Render Ready)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Backend Dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Build Backend Microservice
+        working-directory: ./server
+        run: npm run build
