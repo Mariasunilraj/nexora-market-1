@@ -1,5 +1,5 @@
 // Finnhub API Service for Real-Time US Market Data
-const DEFAULT_FINNHUB_KEY = 'da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0';
+const DEFAULT_FINNHUB_KEY = import.meta.env.VITE_FINNHUB_API_KEY || 'da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0';
 const BASE_URL = 'https://finnhub.io/api/v1';
 
 export interface FinnhubQuote {
