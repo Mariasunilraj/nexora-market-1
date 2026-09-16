@@ -1,11 +1,12 @@
 -- ====================================================================
--- NEXORA US STOCK MARKET TRADING PLATFORM - SUPABASE POSTGRESQL SCHEMA
+-- NEXORA US STOCK MARKET TRADING PLATFORM - IDEMPOTENT SUPABASE SCHEMA
+-- (Safe to run multiple times with ZERO errors)
 -- ====================================================================
 
--- Enable UUID Extension
+-- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. PROFILES TABLE (Linked to Supabase Auth)
+-- 2. PROFILES TABLE (Linked to auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     username TEXT UNIQUE NOT NULL,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. PORTFOLIO HOLDINGS TABLE
+-- 3. PORTFOLIO HOLDINGS TABLE
 CREATE TABLE IF NOT EXISTS public.holdings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -40,7 +41,7 @@ CREATE TABLE IF NOT EXISTS public.holdings (
     CONSTRAINT unique_user_symbol UNIQUE(user_id, symbol)
 );
 
--- 3. ORDERS TABLE (Market & Limit Orders)
+-- 4. ORDERS TABLE (Market & Limit Orders)
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -57,7 +58,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     executed_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. TRANSACTIONS LEDGER (Financial & Cash Flow Records)
+-- 5. TRANSACTIONS LEDGER TABLE
 CREATE TABLE IF NOT EXISTS public.transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -68,7 +69,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. WATCHLISTS TABLE
+-- 6. WATCHLISTS TABLE
 CREATE TABLE IF NOT EXISTS public.watchlists (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -79,7 +80,7 @@ CREATE TABLE IF NOT EXISTS public.watchlists (
     CONSTRAINT unique_user_watchlist_symbol UNIQUE(user_id, symbol)
 );
 
--- 6. PRICE ALERTS TABLE (For High-Process Render Background Worker)
+-- 7. PRICE ALERTS TABLE
 CREATE TABLE IF NOT EXISTS public.price_alerts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -91,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.price_alerts (
 );
 
 -- ====================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ENABLE ROW LEVEL SECURITY (RLS)
 -- ====================================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.holdings ENABLE ROW LEVEL SECURITY;
@@ -100,29 +101,48 @@ ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.watchlists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.price_alerts ENABLE ROW LEVEL SECURITY;
 
--- Profiles Policies
+-- ====================================================================
+-- DROP EXISTING POLICIES (Prevents duplicate policy errors)
+-- ====================================================================
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+
+DROP POLICY IF EXISTS "Users can view own holdings" ON public.holdings;
+DROP POLICY IF EXISTS "Users can manage own holdings" ON public.holdings;
+
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
+DROP POLICY IF EXISTS "Users can insert own orders" ON public.orders;
+DROP POLICY IF EXISTS "Users can update own orders" ON public.orders;
+
+DROP POLICY IF EXISTS "Users can view own transactions" ON public.transactions;
+DROP POLICY IF EXISTS "Users can insert own transactions" ON public.transactions;
+
+DROP POLICY IF EXISTS "Users can view own watchlists" ON public.watchlists;
+DROP POLICY IF EXISTS "Users can manage own watchlists" ON public.watchlists;
+
+DROP POLICY IF EXISTS "Users can manage own price alerts" ON public.price_alerts;
+
+-- ====================================================================
+-- RE-CREATE CLEAN RLS POLICIES
+-- ====================================================================
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Holdings Policies
 CREATE POLICY "Users can view own holdings" ON public.holdings FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can manage own holdings" ON public.holdings FOR ALL USING (auth.uid() = user_id);
 
--- Orders Policies
 CREATE POLICY "Users can view own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id);
 
--- Transactions Policies
 CREATE POLICY "Users can view own transactions" ON public.transactions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own transactions" ON public.transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Watchlists Policies
 CREATE POLICY "Users can view own watchlists" ON public.watchlists FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can manage own watchlists" ON public.watchlists FOR ALL USING (auth.uid() = user_id);
 
--- Price Alerts Policies
 CREATE POLICY "Users can manage own price alerts" ON public.price_alerts FOR ALL USING (auth.uid() = user_id);
 
 -- ====================================================================
@@ -140,7 +160,8 @@ BEGIN
         NEW.raw_user_meta_data->>'avatar_url',
         50000.00,
         50000.00
-    );
+    )
+    ON CONFLICT (id) DO NOTHING;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
