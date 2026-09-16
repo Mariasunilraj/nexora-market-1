@@ -39,7 +39,7 @@ The repository includes a ready-to-deploy [`render.yaml`](render.yaml) Blueprint
 ### Option A: Using Render Blueprints (1-Click Automated)
 1. Go to [**dashboard.render.com**](https://dashboard.render.com).
 2. Click **New +** $\rightarrow$ **Blueprint**.
-3. Connect your GitHub repository `Mariasunilraj/nexora-market`.
+3. Connect your new GitHub repository (e.g., `YOUR_NEW_GITHUB_USERNAME/nexora-market`).
 4. Render will automatically detect `render.yaml` and configure the Web Service with health checks at `/health`.
 5. Under **Environment Variables**, add:
    - `SUPABASE_URL`: Your Supabase Project URL
@@ -57,7 +57,7 @@ The repository includes a ready-to-deploy [`render.yaml`](render.yaml) Blueprint
 ## 🌐 Tier 3: Vercel (Frontend Single Page Application)
 
 1. Go to [**vercel.com/new**](https://vercel.com/new).
-2. Select your GitHub repository `Mariasunilraj/nexora-market` and click **Import**.
+2. Select your new GitHub repository and click **Import**.
 3. Under **Environment Variables**, add:
    - `VITE_SUPABASE_URL`: `https://your-project.supabase.co`
    - `VITE_SUPABASE_ANON_KEY`: `your_supabase_anon_key`
