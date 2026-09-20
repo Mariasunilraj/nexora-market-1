@@ -8,14 +8,12 @@ import {
   Eye,
   EyeOff,
   User,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   KeyRound,
   ArrowLeft,
   RefreshCw,
   Send,
-  ShieldAlert,
 } from 'lucide-react';
 import { userDB, UserAccount } from '../services/userService';
 

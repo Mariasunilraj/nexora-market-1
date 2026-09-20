@@ -1,20 +1,9 @@
 import React from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  ArrowUpRight,
-  ChevronRight,
-  Sparkles,
-  Zap,
-  DollarSign,
-  PieChart as PieIcon,
-  ShieldCheck,
-} from 'lucide-react';
+import { ChevronRight, Zap } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { StatCard } from '../components/common/StatCard';
 import { StockLogo } from '../components/common/StockLogo';
 import { PortfolioChart } from '../components/charts/PortfolioChart';
-import { Sparkline } from '../components/charts/Sparkline';
 import { PageId } from '../components/layout/Sidebar';
 import { formatCurrency, formatPercent } from '../utils/formatters';
 
@@ -26,14 +15,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const {
     stocks,
     holdings,
-    indices,
     totalPortfolioValue,
     buyingPower,
     totalPnL,
     totalPnLPercent,
     todaysPnL,
     todaysPnLPercent,
-    transactions,
     userProfile,
   } = useTrading();
 

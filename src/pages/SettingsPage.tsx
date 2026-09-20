@@ -6,8 +6,6 @@ import {
   CandlestickChart,
   Shield,
   CheckCircle2,
-  Key,
-  Lock,
   Zap,
 } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';

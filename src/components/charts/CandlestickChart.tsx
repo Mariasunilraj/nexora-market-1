@@ -9,7 +9,6 @@ import {
   Compass,
   Edit3,
   Search,
-  Minus,
   ZoomIn,
 } from 'lucide-react';
 import { CandleData } from '../../services/finnhubService';

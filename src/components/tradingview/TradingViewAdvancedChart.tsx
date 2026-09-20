@@ -39,18 +39,17 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   const formattedSymbol = symbol.includes(':') ? symbol : `NASDAQ:${symbol.toUpperCase()}`;
 
   useEffect(() => {
-    if (!container.current) return;
+    const currentContainer = container.current;
+    if (!currentContainer) return;
 
     // Clear previous widget
-    container.current.innerHTML = '';
-
-    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+    currentContainer.innerHTML = '';
 
     const widgetDiv = document.createElement('div');
     widgetDiv.className = 'tradingview-widget-container__widget';
     widgetDiv.style.height = `${effectiveHeight - 32}px`;
     widgetDiv.style.width = '100%';
-    container.current.appendChild(widgetDiv);
+    currentContainer.appendChild(widgetDiv);
 
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
@@ -82,11 +81,11 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
       studies: [],
     });
 
-    container.current.appendChild(script);
+    currentContainer.appendChild(script);
 
     return () => {
-      if (container.current) {
-        container.current.innerHTML = '';
+      if (currentContainer) {
+        currentContainer.innerHTML = '';
       }
     };
   }, [formattedSymbol, theme, effectiveHeight]);

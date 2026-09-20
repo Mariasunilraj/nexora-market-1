@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { OrderStatus } from '../types/trading';
 

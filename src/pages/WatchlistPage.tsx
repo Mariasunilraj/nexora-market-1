@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Star, Zap, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
+import { Plus, Search, Star, Zap } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { StockLogo } from '../components/common/StockLogo';
 import { Modal } from '../components/common/Modal';

@@ -13,8 +13,9 @@ export const TradingViewTechnicalGauge: React.FC<TradingViewTechnicalGaugeProps>
   const formattedSymbol = symbol.includes(':') ? symbol : `NASDAQ:${symbol.toUpperCase()}`;
 
   useEffect(() => {
-    if (!container.current) return;
-    container.current.innerHTML = '';
+    const currentContainer = container.current;
+    if (!currentContainer) return;
+    currentContainer.innerHTML = '';
 
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
@@ -32,11 +33,11 @@ export const TradingViewTechnicalGauge: React.FC<TradingViewTechnicalGaugeProps>
       colorTheme: theme,
     });
 
-    container.current.appendChild(script);
+    currentContainer.appendChild(script);
 
     return () => {
-      if (container.current) {
-        container.current.innerHTML = '';
+      if (currentContainer) {
+        currentContainer.innerHTML = '';
       }
     };
   }, [formattedSymbol, theme]);

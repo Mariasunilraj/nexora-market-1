@@ -3,7 +3,6 @@ import {
   RotateCcw,
   Download,
   FileSpreadsheet,
-  Settings as SettingsIcon,
   KeyRound,
   LogOut,
   User,
@@ -13,31 +12,22 @@ import {
   CreditCard,
   Shield,
   ShieldCheck,
-  ShieldAlert,
   Smartphone,
   Laptop,
-  Globe,
   Lock,
   Eye,
   EyeOff,
   QrCode,
-  Zap,
   Check,
-  ExternalLink,
-  ChevronRight,
-  Clock,
-  Key,
   Camera,
   Upload,
-  Image as ImageIcon,
   Trash2,
-  Users,
 } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { userDB } from '../services/userService';
 import { Modal } from '../components/common/Modal';
 import { formatCurrency, formatPercent } from '../utils/formatters';
-import { STOCK_MARKET_AVATARS, StockMarketAvatar } from '../data/stockMarketAvatars';
+import { STOCK_MARKET_AVATARS } from '../data/stockMarketAvatars';
 
 interface AccountPageProps {
   onNavigateToSettings?: () => void;
@@ -45,7 +35,6 @@ interface AccountPageProps {
 }
 
 export const AccountPage: React.FC<AccountPageProps> = ({
-  onNavigateToSettings,
   onLogout,
 }) => {
   const {

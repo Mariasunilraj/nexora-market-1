@@ -61,223 +61,7 @@ interface TradingContextType {
   loadUserSession: (user: any) => void;
 }
 
-const INITIAL_HOLDINGS: Holding[] = [
-  {
-    id: 'h-1',
-    symbol: 'AAPL',
-    company: 'Apple Inc.',
-    shares: 25,
-    avgPrice: 172.50,
-    currentPrice: 195.34,
-    totalValue: 4883.50,
-    pnl: 570.98,
-    pnlPercent: 13.34,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-2',
-    symbol: 'MSFT',
-    company: 'Microsoft Corp.',
-    shares: 15,
-    avgPrice: 378.85,
-    currentPrice: 415.28,
-    totalValue: 6229.20,
-    pnl: 546.45,
-    pnlPercent: 9.61,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-3',
-    symbol: 'GOOGL',
-    company: 'Alphabet Inc.',
-    shares: 90,
-    avgPrice: 152.40,
-    currentPrice: 181.50,
-    totalValue: 16335.00,
-    pnl: 2619.00,
-    pnlPercent: 19.09,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-4',
-    symbol: 'AMZN',
-    company: 'Amazon.com Inc.',
-    shares: 80,
-    avgPrice: 155.20,
-    currentPrice: 186.40,
-    totalValue: 14912.00,
-    pnl: 2496.00,
-    pnlPercent: 20.10,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-5',
-    symbol: 'TSLA',
-    company: 'Tesla Inc.',
-    shares: 20,
-    avgPrice: 198.30,
-    currentPrice: 248.43,
-    totalValue: 4968.60,
-    pnl: 1002.60,
-    pnlPercent: 25.28,
-    category: 'Stocks'
-  }
-];
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: 'ord-1',
-    symbol: 'AAPL',
-    company: 'Apple Inc.',
-    type: 'Buy',
-    quantity: 10,
-    price: 195.00,
-    orderType: 'Limit',
-    status: 'Open',
-    createdAt: 'Jul 20, 2025 10:30 AM'
-  },
-  {
-    id: 'ord-2',
-    symbol: 'TSLA',
-    company: 'Tesla Inc.',
-    type: 'Sell',
-    quantity: 5,
-    price: 245.00,
-    orderType: 'Limit',
-    status: 'Open',
-    createdAt: 'Jul 20, 2025 10:25 AM'
-  },
-  {
-    id: 'ord-3',
-    symbol: 'MSFT',
-    company: 'Microsoft Corp.',
-    type: 'Buy',
-    quantity: 5,
-    price: 412.50,
-    orderType: 'Market',
-    status: 'Filled',
-    createdAt: 'Jul 20, 2025 09:40 AM',
-    filledAt: 'Jul 20, 2025 09:45 AM'
-  },
-  {
-    id: 'ord-4',
-    symbol: 'GOOGL',
-    company: 'Alphabet Inc.',
-    type: 'Buy',
-    quantity: 2,
-    price: 180.00,
-    orderType: 'Limit',
-    status: 'Filled',
-    createdAt: 'Jul 19, 2025 02:00 PM',
-    filledAt: 'Jul 19, 2025 02:15 PM'
-  },
-  {
-    id: 'ord-5',
-    symbol: 'AMZN',
-    company: 'Amazon.com Inc.',
-    type: 'Sell',
-    quantity: 3,
-    price: 185.00,
-    orderType: 'Limit',
-    status: 'Filled',
-    createdAt: 'Jul 19, 2025 10:45 AM',
-    filledAt: 'Jul 19, 2025 11:05 AM'
-  },
-  {
-    id: 'ord-6',
-    symbol: 'AAPL',
-    company: 'Apple Inc.',
-    type: 'Buy',
-    quantity: 15,
-    price: 192.80,
-    orderType: 'Market',
-    status: 'Filled',
-    createdAt: 'Jul 18, 2025 03:20 PM',
-    filledAt: 'Jul 18, 2025 03:22 PM'
-  },
-  {
-    id: 'ord-7',
-    symbol: 'TSLA',
-    company: 'Tesla Inc.',
-    type: 'Buy',
-    quantity: 8,
-    price: 237.45,
-    orderType: 'Limit',
-    status: 'Filled',
-    createdAt: 'Jul 18, 2025 10:00 AM',
-    filledAt: 'Jul 18, 2025 10:12 AM'
-  },
-  {
-    id: 'ord-8',
-    symbol: 'NVDA',
-    company: 'NVIDIA Corp.',
-    type: 'Buy',
-    quantity: 10,
-    price: 120.00,
-    orderType: 'Limit',
-    status: 'Cancelled',
-    createdAt: 'Jul 17, 2025 01:10 PM'
-  }
-];
-
-const INITIAL_TRANSACTIONS: Transaction[] = [
-  {
-    id: 'tx-1',
-    date: 'Jul 20, 2025 10:30 AM',
-    type: 'Buy',
-    description: 'Bought 10 shares of AAPL',
-    amount: -1950.00,
-    balance: 10246.75
-  },
-  {
-    id: 'tx-2',
-    date: 'Jul 19, 2025 02:15 PM',
-    type: 'Buy',
-    description: 'Bought 2 shares of GOOGL',
-    amount: -360.00,
-    balance: 12196.75
-  },
-  {
-    id: 'tx-3',
-    date: 'Jul 18, 2025 03:22 PM',
-    type: 'Buy',
-    description: 'Bought 15 shares of AAPL',
-    amount: -2892.00,
-    balance: 17476.75
-  },
-  {
-    id: 'tx-4',
-    date: 'Jul 17, 2025 11:05 AM',
-    type: 'Sell',
-    description: 'Sold 3 shares of AMZN',
-    amount: 555.00,
-    balance: 20368.75
-  },
-  {
-    id: 'tx-5',
-    date: 'Jul 16, 2025 09:30 AM',
-    type: 'Deposit',
-    description: 'Initial Virtual Deposit',
-    amount: 30000.00,
-    balance: 10438.75
-  },
-  {
-    id: 'tx-6',
-    date: 'Jul 15, 2025 04:10 PM',
-    type: 'Dividend',
-    description: 'Dividend from MSFT',
-    amount: 12.45,
-    balance: 438.75
-  },
-  {
-    id: 'tx-7',
-    date: 'Jul 14, 2025 01:25 PM',
-    type: 'Adjust',
-    description: 'Interest Adjustment',
-    amount: 5.60,
-    balance: 426.30
-  }
-];
 
 const INITIAL_PROFILE: UserProfile = {
   name: 'Sunil Raj',
@@ -317,33 +101,6 @@ const INITIAL_SETTINGS: UserSettings = {
   }
 };
 
-const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'notif-1',
-    title: 'Order Executed',
-    message: 'Bought 5 shares of MSFT at $412.50',
-    time: 'Jul 20, 09:45 AM',
-    type: 'order',
-    read: false
-  },
-  {
-    id: 'notif-2',
-    title: 'Price Target Alert',
-    message: 'TSLA has crossed $245.00 (+2.61%)',
-    time: 'Jul 20, 10:15 AM',
-    type: 'price',
-    read: false
-  },
-  {
-    id: 'notif-3',
-    title: 'Dividend Received',
-    message: '$12.45 dividend deposited from MSFT',
-    time: 'Jul 15, 04:10 PM',
-    type: 'account',
-    read: true
-  }
-];
-
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
 
 export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -351,8 +108,6 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const saved = localStorage.getItem('nexora_stocks_v3');
     return saved ? JSON.parse(saved) : INITIAL_STOCKS;
   });
-
-  const initialUser = userDB.getActiveUser();
 
   const [holdings, setHoldings] = useState<Holding[]>(() => {
     const user = userDB.getActiveUser();
@@ -369,7 +124,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return user ? user.data.transactions : [];
   });
 
-  const [indices, setIndices] = useState<MarketIndex[]>(INITIAL_MARKET_INDICES);
+  const [indices] = useState<MarketIndex[]>(INITIAL_MARKET_INDICES);
 
   const [virtualCash, setVirtualCash] = useState<number>(() => {
     const user = userDB.getActiveUser();
@@ -502,7 +257,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Fetch real Finnhub quotes on initial load
   useEffect(() => {
     refreshAllQuotes();
-  }, []);
+  }, [refreshAllQuotes]);
 
   // Periodic Finnhub update (every 10 seconds)
   useEffect(() => {

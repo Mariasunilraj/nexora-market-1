@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, Search, TrendingUp, TrendingDown, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Search, TrendingUp, TrendingDown, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { StatCard } from '../components/common/StatCard';
 import { StockLogo } from '../components/common/StockLogo';
-import { Sparkline } from '../components/charts/Sparkline';
 import { OrderActionType, OrderExecutionType, StockQuote } from '../types/trading';
 import { formatCurrency, formatPercent } from '../utils/formatters';
 import { getMarketStatus } from '../utils/marketHours';

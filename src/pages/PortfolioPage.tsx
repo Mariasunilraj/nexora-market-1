@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import {
-  ChevronRight,
   PieChart as PieChartIcon,
   TrendingUp,
-  TrendingDown,
   BarChart3,
   Layers,
   Clock,
-  ArrowUpRight,
-  ArrowDownRight,
   Search,
   SlidersHorizontal,
-  ShieldCheck,
-  Sparkles,
   Download,
-  CheckCircle2,
-  FileSpreadsheet,
   ArrowRight,
 } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
@@ -87,7 +79,6 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
   const profitableHoldingsCount = holdings.filter(h => h.pnl > 0).length;
   const winRate = holdings.length > 0 ? (profitableHoldingsCount / holdings.length) * 100 : 100;
   const bestPerformer = [...holdings].sort((a, b) => b.pnlPercent - a.pnlPercent)[0];
-  const worstPerformer = [...holdings].sort((a, b) => a.pnlPercent - b.pnlPercent)[0];
 
   const handleExportCSV = () => {
     const headers = 'ID,Date,Type,Description,Amount,Balance\n';

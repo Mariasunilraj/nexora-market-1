@@ -11,8 +11,9 @@ export const TradingViewTimelineWidget: React.FC<TradingViewTimelineWidgetProps>
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!container.current) return;
-    container.current.innerHTML = '';
+    const currentContainer = container.current;
+    if (!currentContainer) return;
+    currentContainer.innerHTML = '';
 
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
@@ -28,11 +29,11 @@ export const TradingViewTimelineWidget: React.FC<TradingViewTimelineWidgetProps>
       height: 380,
     });
 
-    container.current.appendChild(script);
+    currentContainer.appendChild(script);
 
     return () => {
-      if (container.current) {
-        container.current.innerHTML = '';
+      if (currentContainer) {
+        currentContainer.innerHTML = '';
       }
     };
   }, [theme]);
