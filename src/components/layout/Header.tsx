@@ -143,7 +143,14 @@ export const Header: React.FC<HeaderProps> = ({ title, onToggleSidebar }) => {
           className="w-8 h-8 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-md ml-1 border border-slate-200 dark:border-slate-700 flex-shrink-0"
         >
           {userProfile.avatarUrl ? (
-            <img src={userProfile.avatarUrl} alt={userProfile.name} className="w-full h-full object-cover" />
+            <img
+              src={userProfile.avatarUrl}
+              alt={userProfile.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
           ) : (
             <span>{userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U'}</span>
           )}

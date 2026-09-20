@@ -110,30 +110,77 @@ export const AccountPage: React.FC<AccountPageProps> = ({
     },
   ]);
 
-  // Photo Upload Handler (FileReader -> Base64 data URL)
+  // Photo Upload Handler (Canvas Smart-Compressor, Transparency Protection, 10MB Support)
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please upload a valid image file (PNG, JPEG, WEBP).');
+      alert('Please upload a valid image file (PNG, JPEG, WEBP, GIF).');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size exceeds 5MB limit. Please choose a smaller image.');
+    // 10MB limit per photo
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds 10MB limit. Please choose a photo smaller than 10MB.');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        updateProfile({ avatarUrl: dataUrl });
-        setActionNotice('Profile photo uploaded and saved successfully!');
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const TARGET_SIZE = 512;
+        canvas.width = TARGET_SIZE;
+        canvas.height = TARGET_SIZE;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Clean white/transparent-safe base to prevent black background rendering
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
+
+        // Center square crop
+        const width = img.width;
+        const height = img.height;
+        let sx = 0;
+        let sy = 0;
+        let sw = width;
+        let sh = height;
+
+        if (width > height) {
+          sx = (width - height) / 2;
+          sw = height;
+        } else if (height > width) {
+          sy = (height - width) / 2;
+          sh = width;
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TARGET_SIZE, TARGET_SIZE);
+
+        // Export high-quality 512x512 avatar data URL (~40KB)
+        const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        updateProfile({ avatarUrl: optimizedDataUrl });
+        setActionNotice('Profile photo (10MB supported) processed and saved successfully!');
         setTimeout(() => setActionNotice(null), 4000);
-      }
+      };
+
+      img.onerror = () => {
+        alert('Failed to process image. Please try another photo.');
+      };
+
+      img.src = event.target?.result as string;
     };
+
+    reader.onerror = () => {
+      alert('Failed to read photo file. Please try again.');
+    };
+
     reader.readAsDataURL(file);
   };
 
@@ -369,6 +416,9 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                           src={userProfile.avatarUrl}
                           alt={userProfile.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
                         />
                       ) : (
                         <span>{userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'U'}</span>
