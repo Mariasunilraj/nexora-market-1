@@ -192,10 +192,13 @@ export const TechnicalAnalysisPage: React.FC<TechnicalAnalysisPageProps> = ({
       {/* 3. WIDE FULL-WIDTH TRADINGVIEW ADVANCED CHART SECTION */}
       <div className="w-full shadow-md dark:shadow-2xl rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1C2951]">
         <TradingViewAdvancedChart
-          symbol={`NASDAQ:${currentStock.symbol}`}
+          symbol={currentStock.symbol}
           theme={theme}
           width="100%"
           height={700}
+          currentPrice={currentStock.price}
+          priceChange={currentStock.change}
+          priceChangePercent={currentStock.changePercent}
         />
       </div>
 
