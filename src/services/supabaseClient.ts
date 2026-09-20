@@ -1,9 +1,9 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Environment variables from Vercel / Vite with auto-sanitization for trailing /rest/v1/
-const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+// Environment variables from Vercel / Vite with live fallback
+const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://vdzpcznnzguojxragjqo.supabase.co';
 const supabaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkenBjem5uemd1b2p4cmFnanFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NDIwNzgsImV4cCI6MjEwNTExODA3OH0.pzw4xGUU0D5rca76DTkGVQAmqFl2xlJu4MlbpN3DGnc').trim();
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
