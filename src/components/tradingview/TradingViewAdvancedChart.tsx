@@ -7,10 +7,6 @@ import {
   BarChart2,
   Layers,
   Radio,
-  Sliders,
-  TrendingUp,
-  TrendingDown,
-  Maximize2,
 } from 'lucide-react';
 import { finnhubClient, CandleData } from '../../services/finnhubService';
 
@@ -28,8 +24,8 @@ interface TradingViewAdvancedChartProps {
 export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> = memo(({
   symbol = 'NASDAQ:AAPL',
   theme = 'dark',
-  height = 700,
-  mobileHeight = 480,
+  height = 640,
+  mobileHeight = 460,
   currentPrice = 195.34,
   priceChange = 2.45,
   priceChangePercent = 1.27,
@@ -112,7 +108,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  // Handle TradingView Script Embedding
+  // Handle TradingView Script Embedding (Zero-Gap Fix)
   useEffect(() => {
     if (engine !== 'tradingview') {
       loadNativeCandles(cleanSymbol, nativeTimeframe);
@@ -126,22 +122,17 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     setIsFeedOk(false);
     setStatusMessage(`Connecting to TradingView Feed for ${formattedSymbol}...`);
 
-    // Reset container contents
-    currentContainer.innerHTML = '';
-
-    const widgetDiv = document.createElement('div');
-    widgetDiv.className = 'tradingview-widget-container__widget';
-    widgetDiv.style.height = `${effectiveHeight - 48}px`;
-    widgetDiv.style.width = '100%';
-    currentContainer.appendChild(widgetDiv);
+    // Reset container contents with single 100% height widget
+    currentContainer.innerHTML = `
+      <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+    `;
 
     const script = document.createElement('script');
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     script.type = 'text/javascript';
     script.async = true;
     script.innerHTML = JSON.stringify({
-      width: '100%',
-      height: effectiveHeight - 48,
+      autosize: true,
       symbol: formattedSymbol,
       interval: 'D',
       timezone: 'America/New_York',
@@ -169,7 +160,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
     // Watch for iframe injection to confirm TradingView is rendered
     let checkCount = 0;
-    const maxChecks = 35; // ~7 seconds timeout
+    const maxChecks = 30; // ~6 seconds timeout
     const checkInterval = setInterval(() => {
       checkCount++;
       const iframe = currentContainer.querySelector('iframe');
@@ -180,7 +171,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
         setStatusMessage(`OK • TradingView Live Feed Active (${formattedSymbol})`);
       } else if (checkCount >= maxChecks) {
         clearInterval(checkInterval);
-        // Fallback automatically or inform user
         setIsLoading(false);
         setIsFeedOk(true);
         setStatusMessage(`Switched to Native Fast Candle Engine (${cleanSymbol})`);
@@ -194,7 +184,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
         currentContainer.innerHTML = '';
       }
     };
-  }, [formattedSymbol, cleanSymbol, theme, effectiveHeight, engine, reloadKey, loadNativeCandles, nativeTimeframe]);
+  }, [formattedSymbol, cleanSymbol, theme, engine, reloadKey, loadNativeCandles, nativeTimeframe]);
 
   // Rerun when timeframe changes in native mode
   useEffect(() => {
@@ -214,9 +204,9 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   const maxVolume = displayedCandles.length > 0 ? Math.max(...displayedCandles.map(c => c.volume)) : 100000000;
 
   const svgWidth = 850;
-  const svgHeight = Math.max(340, effectiveHeight - 160);
-  const chartBottom = svgHeight - 70;
-  const volumeHeight = 50;
+  const svgHeight = Math.max(340, effectiveHeight - 110);
+  const chartBottom = svgHeight - 65;
+  const volumeHeight = 45;
 
   const getY = (price: number) => {
     return chartBottom - ((price - minPrice) / (maxPrice - minPrice || 1)) * (chartBottom - 30);
@@ -242,7 +232,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1C2951] bg-white dark:bg-[#0B132B] shadow-lg transition-colors flex flex-col">
       {/* 1. TOP INTERACTIVE STATUS & ENGINE CONTROL BAR */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-slate-50/90 dark:bg-[#0E1738] border-b border-slate-200 dark:border-[#1C2951]">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-50/90 dark:bg-[#0E1738] border-b border-slate-200 dark:border-[#1C2951] z-10">
         {/* Left: Symbol Badge & Engine Switcher */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30">
@@ -316,14 +306,14 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
         </div>
       </div>
 
-      {/* 2. LOADING SCREEN OVERLAY (Explicitly tells user chart status) */}
+      {/* 2. LOADING SCREEN OVERLAY */}
       {isLoading && (
         <div
-          className="absolute inset-x-0 top-12 bottom-0 z-20 flex flex-col items-center justify-center bg-white/95 dark:bg-[#0B132B]/95 backdrop-blur-sm transition-all p-6 text-center"
+          className="absolute inset-x-0 top-[48px] bottom-0 z-20 flex flex-col items-center justify-center bg-white/95 dark:bg-[#0B132B]/95 backdrop-blur-sm transition-all p-6 text-center"
         >
           <div className="relative mb-4">
-            <div className="w-16 h-16 rounded-full border-4 border-blue-500/20 border-t-blue-600 dark:border-t-blue-400 animate-spin flex items-center justify-center" />
-            <Activity className="w-7 h-7 text-blue-600 dark:text-blue-400 absolute inset-0 m-auto animate-pulse" />
+            <div className="w-14 h-14 rounded-full border-4 border-blue-500/20 border-t-blue-600 dark:border-t-blue-400 animate-spin flex items-center justify-center" />
+            <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400 absolute inset-0 m-auto animate-pulse" />
           </div>
 
           <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -351,206 +341,205 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
         </div>
       )}
 
-      {/* 3. CHART VIEWPORT */}
-      {engine === 'tradingview' ? (
-        /* TRADINGVIEW EMBED ENGINE */
-        <div
-          ref={container}
-          className="w-full flex-1"
-          style={{
-            height: `${effectiveHeight - 48}px`,
-            minHeight: `${effectiveHeight - 48}px`,
-          }}
-        >
+      {/* 3. CHART VIEWPORT (Clean, Direct, Zero Gap) */}
+      <div
+        className="w-full relative bg-white dark:bg-[#0B132B]"
+        style={{
+          height: `${effectiveHeight - 48}px`,
+          minHeight: `${effectiveHeight - 48}px`,
+        }}
+      >
+        {engine === 'tradingview' ? (
+          /* TRADINGVIEW EMBED ENGINE (Autosize 100% height) */
           <div
-            className="tradingview-widget-container__widget"
-            style={{ height: '100%', width: '100%' }}
+            ref={container}
+            className="tradingview-widget-container w-full h-full"
           />
-        </div>
-      ) : (
-        /* NATIVE FAST CANDLESTICK ENGINE */
-        <div className="w-full flex-1 p-4 sm:p-5 flex flex-col justify-between select-none">
-          {/* Native Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#152042]">
-            {/* Timeframes */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#111C3A] p-1 rounded-xl border border-slate-200 dark:border-[#1C2951]">
-              {['1D', '1W', '1M', '3M', '1Y', '5Y', 'MAX'].map((tf) => (
-                <button
-                  key={tf}
-                  onClick={() => setNativeTimeframe(tf)}
-                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
-                    nativeTimeframe === tf
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
-
-            {/* Live OHLC Ticker Readout */}
-            <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
-              <span className="text-slate-500 dark:text-slate-400">
-                O: <span className="font-bold text-slate-900 dark:text-slate-200">${activeCandle.open.toFixed(2)}</span>
-              </span>
-              <span className="text-slate-500 dark:text-slate-400">
-                H: <span className="font-bold text-emerald-600 dark:text-emerald-400">${activeCandle.high.toFixed(2)}</span>
-              </span>
-              <span className="text-slate-500 dark:text-slate-400">
-                L: <span className="font-bold text-rose-600 dark:text-rose-400">${activeCandle.low.toFixed(2)}</span>
-              </span>
-              <span className="text-slate-500 dark:text-slate-400">
-                C: <span className={`font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>${activeCandle.close.toFixed(2)}</span>
-              </span>
-            </div>
-
-            {/* Tools */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setNativeChartType(nativeChartType === 'candles' ? 'line' : 'candles')}
-                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-[#111C3A] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1C2951] hover:text-purple-600"
-              >
-                {nativeChartType === 'candles' ? 'Candles 🕯️' : 'Line 📈'}
-              </button>
-            </div>
-          </div>
-
-          {/* Interactive SVG Canvas */}
-          <div className="relative w-full overflow-hidden my-2" style={{ height: `${svgHeight}px` }}>
-            <svg
-              viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              className="w-full h-full"
-              preserveAspectRatio="none"
-            >
-              {/* Grid Lines */}
-              {[0.2, 0.4, 0.6, 0.8].map((ratio, idx) => {
-                const p = minPrice + (maxPrice - minPrice) * ratio;
-                return (
-                  <line
-                    key={idx}
-                    x1="0"
-                    y1={getY(p)}
-                    x2={svgWidth - 75}
-                    y2={getY(p)}
-                    stroke={theme === 'dark' ? '#16244C' : '#E2E8F0'}
-                    strokeDasharray="3 3"
-                    strokeWidth="1"
-                  />
-                );
-              })}
-
-              {/* Volume Bars */}
-              {displayedCandles.map((candle, idx) => {
-                const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
-                const y = getVolY(candle.volume);
-                const barHeight = svgHeight - y;
-                const candleIsUp = candle.close >= candle.open;
-
-                return (
-                  <rect
-                    key={`vol-${idx}`}
-                    x={x}
-                    y={y}
-                    width={candleWidth}
-                    height={barHeight}
-                    fill={candleIsUp ? '#10B981' : '#EF4444'}
-                    opacity={theme === 'dark' ? 0.35 : 0.25}
-                  />
-                );
-              })}
-
-              {/* Candlesticks */}
-              {nativeChartType === 'candles' && displayedCandles.map((candle, idx) => {
-                const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
-                const centerX = x + candleWidth / 2;
-                const candleIsUp = candle.close >= candle.open;
-                const highY = getY(candle.high);
-                const lowY = getY(candle.low);
-                const openY = getY(candle.open);
-                const closeY = getY(candle.close);
-                const bodyTop = Math.min(openY, closeY);
-                const bodyHeight = Math.max(2, Math.abs(openY - closeY));
-                const color = candleIsUp ? '#10B981' : '#EF4444';
-
-                return (
-                  <g
-                    key={`candle-${idx}`}
-                    className="cursor-pointer transition-opacity hover:opacity-80"
-                    onMouseEnter={() => setHoveredCandle(candle)}
-                    onMouseLeave={() => setHoveredCandle(null)}
+        ) : (
+          /* NATIVE FAST CANDLESTICK ENGINE */
+          <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between select-none">
+            {/* Native Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#152042]">
+              {/* Timeframes */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#111C3A] p-1 rounded-xl border border-slate-200 dark:border-[#1C2951]">
+                {['1D', '1W', '1M', '3M', '1Y', '5Y', 'MAX'].map((tf) => (
+                  <button
+                    key={tf}
+                    onClick={() => setNativeTimeframe(tf)}
+                    className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+                      nativeTimeframe === tf
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
                   >
+                    {tf}
+                  </button>
+                ))}
+              </div>
+
+              {/* Live OHLC Ticker Readout */}
+              <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
+                <span className="text-slate-500 dark:text-slate-400">
+                  O: <span className="font-bold text-slate-900 dark:text-slate-200">${activeCandle.open.toFixed(2)}</span>
+                </span>
+                <span className="text-slate-500 dark:text-slate-400">
+                  H: <span className="font-bold text-emerald-600 dark:text-emerald-400">${activeCandle.high.toFixed(2)}</span>
+                </span>
+                <span className="text-slate-500 dark:text-slate-400">
+                  L: <span className="font-bold text-rose-600 dark:text-rose-400">${activeCandle.low.toFixed(2)}</span>
+                </span>
+                <span className="text-slate-500 dark:text-slate-400">
+                  C: <span className={`font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>${activeCandle.close.toFixed(2)}</span>
+                </span>
+              </div>
+
+              {/* Tools */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setNativeChartType(nativeChartType === 'candles' ? 'line' : 'candles')}
+                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-[#111C3A] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1C2951] hover:text-purple-600"
+                >
+                  {nativeChartType === 'candles' ? 'Candles 🕯️' : 'Line 📈'}
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive SVG Canvas */}
+            <div className="relative w-full overflow-hidden my-2" style={{ height: `${svgHeight}px` }}>
+              <svg
+                viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                className="w-full h-full"
+                preserveAspectRatio="none"
+              >
+                {/* Grid Lines */}
+                {[0.2, 0.4, 0.6, 0.8].map((ratio, idx) => {
+                  const p = minPrice + (maxPrice - minPrice) * ratio;
+                  return (
                     <line
-                      x1={centerX}
-                      y1={highY}
-                      x2={centerX}
-                      y2={lowY}
-                      stroke={color}
-                      strokeWidth="1.5"
+                      key={idx}
+                      x1="0"
+                      y1={getY(p)}
+                      x2={svgWidth - 75}
+                      y2={getY(p)}
+                      stroke={theme === 'dark' ? '#16244C' : '#E2E8F0'}
+                      strokeDasharray="3 3"
+                      strokeWidth="1"
                     />
+                  );
+                })}
+
+                {/* Volume Bars */}
+                {displayedCandles.map((candle, idx) => {
+                  const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
+                  const y = getVolY(candle.volume);
+                  const barHeight = svgHeight - y;
+                  const candleIsUp = candle.close >= candle.open;
+
+                  return (
                     <rect
+                      key={`vol-${idx}`}
                       x={x}
-                      y={bodyTop}
+                      y={y}
                       width={candleWidth}
-                      height={bodyHeight}
-                      fill={color}
-                      rx="1"
+                      height={barHeight}
+                      fill={candleIsUp ? '#10B981' : '#EF4444'}
+                      opacity={theme === 'dark' ? 0.35 : 0.25}
                     />
-                  </g>
-                );
-              })}
+                  );
+                })}
 
-              {/* Line chart mode */}
-              {nativeChartType === 'line' && (
-                <path
-                  d={displayedCandles.reduce((acc, c, idx) => {
-                    const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
-                    const y = getY(c.close);
-                    return idx === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
-                  }, '')}
-                  fill="none"
-                  stroke="#3B82F6"
-                  strokeWidth="2.5"
+                {/* Candlesticks */}
+                {nativeChartType === 'candles' && displayedCandles.map((candle, idx) => {
+                  const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
+                  const centerX = x + candleWidth / 2;
+                  const candleIsUp = candle.close >= candle.open;
+                  const highY = getY(candle.high);
+                  const lowY = getY(candle.low);
+                  const openY = getY(candle.open);
+                  const closeY = getY(candle.close);
+                  const bodyTop = Math.min(openY, closeY);
+                  const bodyHeight = Math.max(2, Math.abs(openY - closeY));
+                  const color = candleIsUp ? '#10B981' : '#EF4444';
+
+                  return (
+                    <g
+                      key={`candle-${idx}`}
+                      className="cursor-pointer transition-opacity hover:opacity-80"
+                      onMouseEnter={() => setHoveredCandle(candle)}
+                      onMouseLeave={() => setHoveredCandle(null)}
+                    >
+                      <line
+                        x1={centerX}
+                        y1={highY}
+                        x2={centerX}
+                        y2={lowY}
+                        stroke={color}
+                        strokeWidth="1.5"
+                      />
+                      <rect
+                        x={x}
+                        y={bodyTop}
+                        width={candleWidth}
+                        height={bodyHeight}
+                        fill={color}
+                        rx="1"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Line chart mode */}
+                {nativeChartType === 'line' && (
+                  <path
+                    d={displayedCandles.reduce((acc, c, idx) => {
+                      const x = idx * ((svgWidth - 80) / displayedCandles.length) + 10;
+                      const y = getY(c.close);
+                      return idx === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
+                    }, '')}
+                    fill="none"
+                    stroke="#3B82F6"
+                    strokeWidth="2.5"
+                  />
+                )}
+
+                {/* Price Reference Line */}
+                <line
+                  x1="0"
+                  y1={getY(currentPrice)}
+                  x2={svgWidth - 75}
+                  y2={getY(currentPrice)}
+                  stroke="#10B981"
+                  strokeDasharray="2 2"
+                  strokeWidth="1.5"
                 />
-              )}
+              </svg>
 
-              {/* Price Reference Line */}
-              <line
-                x1="0"
-                y1={getY(currentPrice)}
-                x2={svgWidth - 75}
-                y2={getY(currentPrice)}
-                stroke="#10B981"
-                strokeDasharray="2 2"
-                strokeWidth="1.5"
-              />
-            </svg>
+              {/* Price Scale */}
+              <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-slate-200 dark:border-[#152042] flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                <span>${maxPrice.toFixed(2)}</span>
+                <span>${((maxPrice + minPrice) / 2).toFixed(2)}</span>
+                <span className="bg-emerald-500 text-slate-950 px-1 py-0.5 rounded font-bold text-[10px] shadow-sm">
+                  ${currentPrice.toFixed(2)}
+                </span>
+                <span>${minPrice.toFixed(2)}</span>
+              </div>
+            </div>
 
-            {/* Price Scale */}
-            <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-slate-200 dark:border-[#152042] flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-slate-500 dark:text-slate-400">
-              <span>${maxPrice.toFixed(2)}</span>
-              <span>${((maxPrice + minPrice) / 2).toFixed(2)}</span>
-              <span className="bg-emerald-500 text-slate-950 px-1 py-0.5 rounded font-bold text-[10px] shadow-sm">
-                ${currentPrice.toFixed(2)}
-              </span>
-              <span>${minPrice.toFixed(2)}</span>
+            {/* Timeline Bar */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#152042] text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+              <div className="flex gap-4 overflow-hidden">
+                {displayedCandles.slice(0, 6).map((c, i) => (
+                  <span key={i}>{c.time}</span>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>NEXORA Ultra-Low Latency Feed</span>
+              </div>
             </div>
           </div>
-
-          {/* Timeline Bar */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#152042] text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-            <div className="flex gap-4 overflow-hidden">
-              {displayedCandles.slice(0, 6).map((c, i) => (
-                <span key={i}>{c.time}</span>
-              ))}
-            </div>
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>NEXORA Ultra-Low Latency Feed</span>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 });
