@@ -76,180 +76,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   }
 };
 
-const DEFAULT_PORTFOLIO_HOLDINGS: Holding[] = [
-  {
-    id: 'h-1',
-    symbol: 'AAPL',
-    company: 'Apple Inc.',
-    shares: 25,
-    avgPrice: 172.50,
-    currentPrice: 195.34,
-    totalValue: 4883.50,
-    pnl: 570.98,
-    pnlPercent: 13.34,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-2',
-    symbol: 'MSFT',
-    company: 'Microsoft Corp.',
-    shares: 15,
-    avgPrice: 378.85,
-    currentPrice: 415.28,
-    totalValue: 6229.20,
-    pnl: 546.45,
-    pnlPercent: 9.61,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-3',
-    symbol: 'GOOGL',
-    company: 'Alphabet Inc.',
-    shares: 90,
-    avgPrice: 152.40,
-    currentPrice: 181.50,
-    totalValue: 16335.00,
-    pnl: 2619.00,
-    pnlPercent: 19.09,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-4',
-    symbol: 'AMZN',
-    company: 'Amazon.com Inc.',
-    shares: 80,
-    avgPrice: 155.20,
-    currentPrice: 186.40,
-    totalValue: 14912.00,
-    pnl: 2496.00,
-    pnlPercent: 20.10,
-    category: 'Stocks'
-  },
-  {
-    id: 'h-5',
-    symbol: 'TSLA',
-    company: 'Tesla Inc.',
-    shares: 20,
-    avgPrice: 198.30,
-    currentPrice: 248.43,
-    totalValue: 4968.60,
-    pnl: 1002.60,
-    pnlPercent: 25.28,
-    category: 'Stocks'
-  }
-];
-
-const DEFAULT_PORTFOLIO_ORDERS: Order[] = [
-  {
-    id: 'ord-1',
-    symbol: 'AAPL',
-    company: 'Apple Inc.',
-    type: 'Buy',
-    quantity: 10,
-    price: 195.00,
-    orderType: 'Limit',
-    status: 'Open',
-    createdAt: 'Jul 20, 2025 10:30 AM'
-  },
-  {
-    id: 'ord-2',
-    symbol: 'TSLA',
-    company: 'Tesla Inc.',
-    type: 'Sell',
-    quantity: 5,
-    price: 245.00,
-    orderType: 'Limit',
-    status: 'Open',
-    createdAt: 'Jul 20, 2025 10:25 AM'
-  },
-  {
-    id: 'ord-3',
-    symbol: 'MSFT',
-    company: 'Microsoft Corp.',
-    type: 'Buy',
-    quantity: 5,
-    price: 412.50,
-    orderType: 'Market',
-    status: 'Filled',
-    createdAt: 'Jul 20, 2025 09:40 AM',
-    filledAt: 'Jul 20, 2025 09:45 AM'
-  }
-];
-
-const DEFAULT_PORTFOLIO_TRANSACTIONS: Transaction[] = [
-  {
-    id: 'tx-1',
-    date: 'Jul 20, 2025 10:30 AM',
-    type: 'Buy',
-    description: 'Bought 10 shares of AAPL',
-    amount: -1950.00,
-    balance: 10246.75
-  },
-  {
-    id: 'tx-5',
-    date: 'Jul 16, 2025 09:30 AM',
-    type: 'Deposit',
-    description: 'Initial Virtual Deposit',
-    amount: 30000.00,
-    balance: 10438.75
-  }
-];
-
-const SEED_SALT_1 = 'salt_sunil_01';
-const SEED_SALT_2 = 'salt_maria_02';
-
-// Seed user Maria Sunil Raj
-const SEED_MARIA_SUNIL_USER: UserAccount = {
-  id: 'usr-maria-sunil-raj',
-  username: 'mariasunilraj8',
-  email: 'mariasunilraj8@gmail.com',
-  salt: SEED_SALT_2,
-  passwordHash: secureHash('password123', SEED_SALT_2),
-  createdAt: 'July 2025',
-  profile: {
-    name: 'Maria Sunil Raj',
-    email: 'mariasunilraj8@gmail.com',
-    memberSince: 'July 2025',
-    plan: 'Paper Trading Pro',
-  },
-  data: {
-    cash: 10246.75,
-    holdings: DEFAULT_PORTFOLIO_HOLDINGS,
-    orders: DEFAULT_PORTFOLIO_ORDERS,
-    transactions: DEFAULT_PORTFOLIO_TRANSACTIONS,
-    settings: DEFAULT_SETTINGS,
-    notifications: [
-      {
-        id: 'notif-1',
-        title: 'Order Executed',
-        message: 'Bought 5 shares of MSFT at $412.50',
-        time: 'Jul 20, 09:45 AM',
-        type: 'order',
-        read: false
-      }
-    ]
-  }
-};
-
-const SEED_SUNIL_USER: UserAccount = {
-  ...SEED_MARIA_SUNIL_USER,
-  id: 'usr-sunil-raj',
-  username: 'sunilraj',
-  email: 'sunilraj@example.com',
-  salt: SEED_SALT_1,
-  passwordHash: secureHash('password123', SEED_SALT_1),
-  profile: {
-    ...SEED_MARIA_SUNIL_USER.profile,
-    name: 'Sunil Raj',
-    email: 'sunilraj@example.com',
-  }
-};
-
-const INITIAL_SEEDED_USERS: UserAccount[] = [
-  SEED_MARIA_SUNIL_USER,
-  SEED_SUNIL_USER,
-];
-
 export class UserService {
   private getUserDataKey(userId: string): string {
     return `nexora_user_data_${userId}`;
@@ -259,28 +85,20 @@ export class UserService {
     const raw = localStorage.getItem(USERS_DB_KEY);
     let userList: UserAccount[] = [];
 
-    if (!raw) {
-      userList = [...INITIAL_SEEDED_USERS];
-      this.saveUsers(userList);
-    } else {
+    if (raw) {
       try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          userList = parsed;
-        } else {
-          userList = [...INITIAL_SEEDED_USERS];
+          // Filter out any legacy hardcoded dummy accounts
+          userList = parsed.filter(u => 
+            u.id !== 'usr-sunil-raj' && 
+            u.id !== 'usr-maria-sunil-raj' &&
+            u.email.toLowerCase() !== 'sunilraj@example.com' &&
+            u.email.toLowerCase() !== 'mariasunilraj8@gmail.com'
+          );
         }
       } catch {
-        userList = [...INITIAL_SEEDED_USERS];
-      }
-    }
-
-    // Auto-heal seed accounts if missing
-    let modified = false;
-    for (const seed of INITIAL_SEEDED_USERS) {
-      if (!userList.some(u => u.email.toLowerCase() === seed.email.toLowerCase() || u.username.toLowerCase() === seed.username.toLowerCase())) {
-        userList.push(seed);
-        modified = true;
+        userList = [];
       }
     }
 
@@ -313,10 +131,7 @@ export class UserService {
       }
     }
 
-    if (modified) {
-      this.saveUsers(userList);
-    }
-
+    this.saveUsers(userList);
     return userList;
   }
 
@@ -346,7 +161,12 @@ export class UserService {
 
   getActiveUser(): UserAccount | null {
     const id = this.getActiveUserId();
-    if (!id) return null;
+    if (!id || id === 'usr-sunil-raj' || id === 'usr-maria-sunil-raj') {
+      if (id === 'usr-sunil-raj' || id === 'usr-maria-sunil-raj') {
+        this.logout();
+      }
+      return null;
+    }
     const users = this.getUsers();
     const found = users.find(u => u.id === id);
     if (!found) return null;
@@ -472,8 +292,7 @@ export class UserService {
     
     const isValid =
       user.passwordHash === computedHash ||
-      user.passwordHash === password ||
-      (password === 'password123' && (user.id === 'usr-sunil-raj' || user.id === 'usr-maria-sunil-raj'));
+      user.passwordHash === password;
 
     if (!isValid) {
       return { success: false, message: 'Incorrect password. Please try again.' };
