@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { TradingProvider, useTrading } from './context/TradingContext';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { Layout } from './components/layout/Layout';
 import { PageId } from './components/layout/Sidebar';
 import { PortfolioPage } from './pages/PortfolioPage';
@@ -108,10 +109,12 @@ export function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <TradingProvider>
-        <AppContent />
-      </TradingProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <TradingProvider>
+          <AppContent />
+        </TradingProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

@@ -59,7 +59,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     promotions: true,
   },
   display: {
-    theme: 'dark',
+    theme: 'light',
     sidebarPosition: 'left',
     pageLayout: 'full',
     rowsPerPage: 10,
@@ -292,16 +292,24 @@ export class UserService {
           const userSpecific = JSON.parse(userSpecificDataRaw);
           user.data = { ...user.data, ...userSpecific.data };
           if (userSpecific.profile) {
+            // Auto-heal oversized avatar strings
+            if (userSpecific.profile.avatarUrl && userSpecific.profile.avatarUrl.length > 300000) {
+              userSpecific.profile.avatarUrl = undefined;
+            }
             user.profile = { ...user.profile, ...userSpecific.profile };
           }
         } catch {
           // ignore corrupted individual slice
         }
       } else {
-        localStorage.setItem(this.getUserDataKey(user.id), JSON.stringify({
-          profile: user.profile,
-          data: user.data,
-        }));
+        try {
+          localStorage.setItem(this.getUserDataKey(user.id), JSON.stringify({
+            profile: user.profile,
+            data: user.data,
+          }));
+        } catch {
+          // ignore quota limits
+        }
       }
     }
 
@@ -313,7 +321,23 @@ export class UserService {
   }
 
   private saveUsers(users: UserAccount[]) {
-    localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+    try {
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+    } catch {
+      // If quota exceeded due to large objects, prune oversized fields and retry
+      try {
+        const pruned = users.map(u => ({
+          ...u,
+          profile: {
+            ...u.profile,
+            avatarUrl: u.profile.avatarUrl && u.profile.avatarUrl.length > 200000 ? undefined : u.profile.avatarUrl
+          }
+        }));
+        localStorage.setItem(USERS_DB_KEY, JSON.stringify(pruned));
+      } catch {
+        // graceful degrade
+      }
+    }
   }
 
   getActiveUserId(): string | null {
@@ -630,7 +654,11 @@ export class UserService {
       ...updatedData,
     };
 
-    localStorage.setItem(userKey, JSON.stringify(currentSlice));
+    try {
+      localStorage.setItem(userKey, JSON.stringify(currentSlice));
+    } catch {
+      // quota limit safe
+    }
 
     const users = this.getUsers();
     const userIdx = users.findIndex(u => u.id === activeId);
