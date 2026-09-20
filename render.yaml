@@ -7,7 +7,7 @@ services:
   - type: web
     name: nexora-trading-backend
     runtime: node
-    plan: starter # Or 'free'
+    plan: free
     region: oregon # or frankfurt / singapore
     rootDir: server
     buildCommand: npm install && npm run build
