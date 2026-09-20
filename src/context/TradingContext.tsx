@@ -72,7 +72,7 @@ const INITIAL_PROFILE: UserProfile = {
 
 const INITIAL_SETTINGS: UserSettings = {
   siteDashboardUrl: 'https://nexora.com/dashboard',
-  defaultLandingPage: 'Dashboard',
+  defaultLandingPage: 'Portfolio',
   timezone: '(GMT+05:30) Asia/Kolkata',
   dateFormat: 'Jul 20, 2025',
   currency: 'USD - US Dollar',

@@ -15,13 +15,29 @@ import { DashboardPage } from './pages/DashboardPage';
 import { AuthPage } from './pages/AuthPage';
 import { userDB, UserAccount } from './services/userService';
 
+const resolveLandingPage = (landingName?: string): PageId => {
+  const clean = (landingName || '').toLowerCase().trim();
+  if (clean === 'dashboard') return 'dashboard';
+  if (clean === 'paper trading' || clean === 'paper-trading' || clean === 'trade') return 'paper-trading';
+  if (clean === 'watchlist') return 'watchlist';
+  if (clean === 'orders') return 'orders';
+  if (clean === 'transactions' || clean === 'history') return 'transactions';
+  if (clean === 'account' || clean === 'profile') return 'account';
+  if (clean === 'settings') return 'settings';
+  if (clean === 'technical analysis' || clean === 'technical-analysis') return 'technical-analysis';
+  return 'portfolio'; // Default landing page is Portfolio
+};
+
 export function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return userDB.getActiveUserId() !== null;
   });
 
   const [authView, setAuthView] = useState<'login' | 'register' | 'signed-out'>('login');
-  const [activePage, setActivePage] = useState<PageId>('portfolio');
+  const [activePage, setActivePage] = useState<PageId>(() => {
+    const activeUser = userDB.getActiveUser();
+    return resolveLandingPage(activeUser?.data?.settings?.defaultLandingPage);
+  });
   const [selectedTradeSymbol, setSelectedTradeSymbol] = useState<string | undefined>('AAPL');
   const { loadUserSession } = useTrading();
 
@@ -42,7 +58,8 @@ export function AppContent() {
   const handleAuthSuccess = (user: UserAccount) => {
     loadUserSession(user);
     setIsAuthenticated(true);
-    setActivePage('dashboard');
+    const targetPage = resolveLandingPage(user.data?.settings?.defaultLandingPage);
+    setActivePage(targetPage);
   };
 
   if (!isAuthenticated) {
