@@ -64,10 +64,10 @@ interface TradingContextType {
 
 
 const INITIAL_PROFILE: UserProfile = {
-  name: 'Sunil Raj',
-  email: 'sunilraj@example.com',
-  memberSince: 'July 2025',
-  plan: 'Premium Plan'
+  name: 'Trader',
+  email: 'trader@nexora.com',
+  memberSince: '2025',
+  plan: 'Paper Trading Pro'
 };
 
 const INITIAL_SETTINGS: UserSettings = {

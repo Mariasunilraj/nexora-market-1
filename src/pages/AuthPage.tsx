@@ -375,13 +375,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Username or Gmail ID
+                  Email Address or Username
                 </label>
                 <div className="relative flex items-center">
                   <input
                     type="text"
                     required
-                    placeholder="e.g. mariasunilraj8@gmail.com"
+                    placeholder="Enter your email or username"
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
@@ -492,7 +492,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       <input
                         type="text"
                         required
-                        placeholder="e.g. mariasunilraj8@gmail.com"
+                        placeholder="Enter your email or username"
                         value={forgotIdentifier}
                         onChange={(e) => setForgotIdentifier(e.target.value)}
                         className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
