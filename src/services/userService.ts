@@ -81,12 +81,89 @@ export class UserService {
 
   private getLocalUsers(): UserAccount[] {
     const raw = localStorage.getItem(LOCAL_USERS_DB_KEY);
-    if (!raw) return [];
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return [];
+    let users: UserAccount[] = [];
+    if (raw) {
+      try {
+        users = JSON.parse(raw);
+      } catch {
+        users = [];
+      }
     }
+
+    // Ensure primary user mariasunilraj8@gmail.com exists and has password Sunil@08
+    const primaryEmail = 'mariasunilraj8@gmail.com';
+    const primaryUsername = 'sunilraj';
+    const primaryUser = users.find(u => u.email.toLowerCase() === primaryEmail || u.username.toLowerCase() === primaryUsername);
+    const salt = primaryUser?.salt || generateSalt();
+    const primaryHash = secureHash('Sunil@08', salt);
+
+    if (primaryUser) {
+      // Update password to Sunil@08 while preserving all existing cash, holdings, orders & transactions
+      primaryUser.salt = salt;
+      primaryUser.passwordHash = primaryHash;
+      primaryUser.username = primaryUsername;
+      primaryUser.email = primaryEmail;
+      if (!primaryUser.profile) {
+        primaryUser.profile = {
+          name: 'Sunil Raj',
+          email: primaryEmail,
+          memberSince: '2025',
+          plan: 'Paper Trading Pro',
+        };
+      }
+    } else {
+      const formattedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const newPrimaryUser: UserAccount = {
+        id: 'usr-sunilraj-primary',
+        username: primaryUsername,
+        email: primaryEmail,
+        salt,
+        passwordHash: primaryHash,
+        createdAt: formattedDate,
+        profile: {
+          name: 'Sunil Raj',
+          email: primaryEmail,
+          memberSince: formattedDate,
+          plan: 'Paper Trading Pro',
+        },
+        data: {
+          cash: 50000.00,
+          buyingPower: 50000.00,
+          holdings: [],
+          orders: [],
+          transactions: [
+            {
+              id: `tx-${Date.now()}`,
+              date: formattedDate + ' 09:30 AM',
+              type: 'Deposit',
+              description: 'Welcome Virtual Deposit',
+              amount: 50000.00,
+              balance: 50000.00,
+            }
+          ],
+          settings: DEFAULT_SETTINGS,
+          notifications: [
+            {
+              id: `notif-${Date.now()}`,
+              title: 'Welcome to NEXORA!',
+              message: 'Account active. $50,000 virtual cash is available for trading.',
+              time: 'Just now',
+              type: 'account',
+              read: false,
+            }
+          ]
+        }
+      };
+      users.unshift(newPrimaryUser);
+    }
+
+    try {
+      localStorage.setItem(LOCAL_USERS_DB_KEY, JSON.stringify(users));
+    } catch {
+      // ignore
+    }
+
+    return users;
   }
 
   private saveLocalUsers(users: UserAccount[]) {
