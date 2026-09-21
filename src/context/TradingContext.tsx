@@ -104,15 +104,20 @@ const INITIAL_SETTINGS: UserSettings = {
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
 
 export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const getInitialUser = () => userDB.getActiveUser();
+
   const [stocks, setStocks] = useState<StockQuote[]>(INITIAL_STOCKS);
-  const [holdings, setHoldings] = useState<Holding[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [holdings, setHoldings] = useState<Holding[]>(() => getInitialUser()?.data?.holdings || []);
+  const [orders, setOrders] = useState<Order[]>(() => getInitialUser()?.data?.orders || []);
+  const [transactions, setTransactions] = useState<Transaction[]>(() => getInitialUser()?.data?.transactions || []);
   const [indices] = useState<MarketIndex[]>(INITIAL_MARKET_INDICES);
-  const [virtualCash, setVirtualCash] = useState<number>(10000);
-  const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_PROFILE);
-  const [settings, setSettings] = useState<UserSettings>(INITIAL_SETTINGS);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [virtualCash, setVirtualCash] = useState<number>(() => {
+    const u = getInitialUser();
+    return typeof u?.data?.cash === 'number' ? u.data.cash : 10000;
+  });
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => getInitialUser()?.profile || INITIAL_PROFILE);
+  const [settings, setSettings] = useState<UserSettings>(() => getInitialUser()?.data?.settings || INITIAL_SETTINGS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => getInitialUser()?.data?.notifications || []);
   const [isLiveApiConnected, setIsLiveApiConnected] = useState<boolean>(true);
 
   const isSyncingRef = useRef<boolean>(false);
@@ -135,12 +140,22 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!activeId) return;
 
     const cloudData = await cloudTradingService.fetchCloudUserData(activeId);
-    if (cloudData) {
-      setUserProfile(cloudData.profile);
+    if (cloudData && cloudData.profile) {
+      setUserProfile(prev => ({
+        ...prev,
+        ...cloudData.profile,
+        name: (cloudData.profile.name && cloudData.profile.name !== 'Trader') ? cloudData.profile.name : prev.name,
+      }));
       setVirtualCash(cloudData.cash);
-      setHoldings(cloudData.holdings);
-      setOrders(cloudData.orders);
-      setTransactions(cloudData.transactions);
+      if (cloudData.holdings && cloudData.holdings.length > 0) {
+        setHoldings(cloudData.holdings);
+      }
+      if (cloudData.orders && cloudData.orders.length > 0) {
+        setOrders(cloudData.orders);
+      }
+      if (cloudData.transactions && cloudData.transactions.length > 0) {
+        setTransactions(cloudData.transactions);
+      }
     }
   }, []);
 
@@ -164,6 +179,21 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       unsubscribe();
     };
   }, [loadUserSession, refreshCloudData]);
+
+  // Always keep userDB active user in sync so page refresh retains all current changes
+  useEffect(() => {
+    const activeUser = userDB.getActiveUser();
+    if (!activeUser) return;
+
+    userDB.updateActiveUserData(() => ({
+      cash: virtualCash,
+      holdings,
+      orders,
+      transactions,
+      settings,
+      notifications,
+    }));
+  }, [virtualCash, holdings, orders, transactions, settings, notifications]);
 
   // Compute accurate Realized & Unrealized P&L
   const totalHoldingsValue = holdings.reduce((acc, h) => acc + h.shares * h.currentPrice, 0);

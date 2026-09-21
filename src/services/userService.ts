@@ -453,46 +453,7 @@ export class UserService {
   }
 
   private async initSession() {
-    // 1. Try Supabase Cloud Session
-    if (supabase) {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (data?.session?.user) {
-          const user = data.session.user;
-          const cloudData = await cloudTradingService.fetchCloudUserData(user.id);
-
-          this.activeUser = {
-            id: user.id,
-            username: user.user_metadata?.username || user.email?.split('@')[0] || 'Trader',
-            email: user.email || '',
-            createdAt: new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-            profile: cloudData?.profile || {
-              name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader',
-              email: user.email || '',
-              memberSince: '2025',
-              plan: 'Paper Trading Pro',
-            },
-            data: {
-              cash: cloudData?.cash ?? 10000,
-              buyingPower: cloudData?.buyingPower ?? 10000,
-              holdings: cloudData?.holdings || [],
-              orders: cloudData?.orders || [],
-              transactions: cloudData?.transactions || [],
-              settings: DEFAULT_SETTINGS,
-              notifications: [],
-            }
-          };
-
-          localStorage.setItem(ACTIVE_USER_ID_KEY, user.id);
-          localStorage.setItem(ACTIVE_USER_DATA_KEY, JSON.stringify(this.activeUser));
-          return;
-        }
-      } catch {
-        // Fall through to local session
-      }
-    }
-
-    // 2. Fallback to cached active session
+    // 1. Immediately read cached active session synchronously
     const raw = localStorage.getItem(ACTIVE_USER_DATA_KEY);
     if (raw) {
       try {
@@ -501,9 +462,49 @@ export class UserService {
         // ignore
       }
     }
+
+    // 2. Sync from Supabase Cloud Session if available without overwriting local custom profile
+    if (supabase) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session?.user) {
+          const user = data.session.user;
+          const cloudData = await cloudTradingService.fetchCloudUserData(user.id);
+          const currentCached = this.activeUser;
+
+          this.activeUser = {
+            id: user.id,
+            username: user.user_metadata?.username || (currentCached?.id === user.id ? currentCached.username : null) || user.email?.split('@')[0] || 'Trader',
+            email: user.email || '',
+            createdAt: new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+            profile: cloudData?.profile || (currentCached?.id === user.id ? currentCached.profile : null) || {
+              name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Trader',
+              email: user.email || '',
+              memberSince: '2025',
+              plan: 'Paper Trading Pro',
+            },
+            data: {
+              cash: cloudData?.cash ?? (currentCached?.id === user.id ? currentCached.data.cash : 10000),
+              buyingPower: cloudData?.buyingPower ?? (currentCached?.id === user.id ? currentCached.data.buyingPower : 10000),
+              holdings: cloudData?.holdings || (currentCached?.id === user.id ? currentCached.data.holdings : []),
+              orders: cloudData?.orders || (currentCached?.id === user.id ? currentCached.data.orders : []),
+              transactions: cloudData?.transactions || (currentCached?.id === user.id ? currentCached.data.transactions : []),
+              settings: currentCached?.data.settings || DEFAULT_SETTINGS,
+              notifications: currentCached?.data.notifications || [],
+            }
+          };
+
+          localStorage.setItem(ACTIVE_USER_ID_KEY, user.id);
+          localStorage.setItem(ACTIVE_USER_DATA_KEY, JSON.stringify(this.activeUser));
+        }
+      } catch {
+        // Fall through to local session
+      }
+    }
   }
 
   getActiveUserId(): string | null {
+    if (this.activeUser) return this.activeUser.id;
     return localStorage.getItem(ACTIVE_USER_ID_KEY);
   }
 
@@ -530,6 +531,45 @@ export class UserService {
     } else {
       localStorage.removeItem(ACTIVE_USER_ID_KEY);
       localStorage.removeItem(ACTIVE_USER_DATA_KEY);
+    }
+  }
+
+  updateActiveUserData(updater: (prevData: UserAccount['data']) => Partial<UserAccount['data']>) {
+    const user = this.getActiveUser();
+    if (!user) return;
+    const partial = updater(user.data);
+    user.data = { ...user.data, ...partial };
+    this.setActiveUser(user);
+
+    // Also update in local users registry
+    try {
+      const localUsers = this.getLocalUsers();
+      const idx = localUsers.findIndex(u => u.id === user.id);
+      if (idx >= 0) {
+        localUsers[idx] = user;
+        this.saveLocalUsers(localUsers);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  updateActiveUserProfile(partialProfile: Partial<UserProfile>) {
+    const user = this.getActiveUser();
+    if (!user) return;
+    user.profile = { ...user.profile, ...partialProfile };
+    this.setActiveUser(user);
+
+    // Also update in local users registry
+    try {
+      const localUsers = this.getLocalUsers();
+      const idx = localUsers.findIndex(u => u.id === user.id);
+      if (idx >= 0) {
+        localUsers[idx] = user;
+        this.saveLocalUsers(localUsers);
+      }
+    } catch {
+      // ignore
     }
   }
 

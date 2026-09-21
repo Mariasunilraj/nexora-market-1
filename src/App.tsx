@@ -50,26 +50,28 @@ export function AppContent() {
 
     // Check initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const activeLocal = userDB.getActiveUser();
+
       if (session?.user) {
         const cloudData = await cloudTradingService.fetchCloudUserData(session.user.id);
         const userAccount: UserAccount = {
           id: session.user.id,
-          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Trader',
-          email: session.user.email || '',
+          username: session.user.user_metadata?.username || (activeLocal?.id === session.user.id ? activeLocal.username : null) || session.user.email?.split('@')[0] || 'Trader',
+          email: session.user.email || activeLocal?.email || '',
           createdAt: new Date(session.user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-          profile: cloudData?.profile || {
+          profile: cloudData?.profile || (activeLocal?.id === session.user.id ? activeLocal.profile : null) || {
             name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Trader',
             email: session.user.email || '',
             memberSince: '2025',
             plan: 'Paper Trading Pro',
           },
           data: {
-            cash: cloudData?.cash ?? 10000,
-            buyingPower: cloudData?.buyingPower ?? 10000,
-            holdings: cloudData?.holdings || [],
-            orders: cloudData?.orders || [],
-            transactions: cloudData?.transactions || [],
-            settings: {
+            cash: cloudData?.cash ?? (activeLocal?.id === session.user.id ? activeLocal.data.cash : 10000),
+            buyingPower: cloudData?.buyingPower ?? (activeLocal?.id === session.user.id ? activeLocal.data.buyingPower : 10000),
+            holdings: (cloudData?.holdings && cloudData.holdings.length > 0) ? cloudData.holdings : (activeLocal?.id === session.user.id ? activeLocal.data.holdings : []),
+            orders: (cloudData?.orders && cloudData.orders.length > 0) ? cloudData.orders : (activeLocal?.id === session.user.id ? activeLocal.data.orders : []),
+            transactions: (cloudData?.transactions && cloudData.transactions.length > 0) ? cloudData.transactions : (activeLocal?.id === session.user.id ? activeLocal.data.transactions : []),
+            settings: activeLocal?.data.settings || {
               siteDashboardUrl: 'https://nexora.com/dashboard',
               defaultLandingPage: 'Portfolio',
               timezone: '(GMT+05:30) Asia/Kolkata',
@@ -99,37 +101,42 @@ export function AppContent() {
                 twoFactorEnabled: false,
               }
             },
-            notifications: [],
+            notifications: activeLocal?.data.notifications || [],
           }
         };
 
         userDB.setActiveUser(userAccount);
         loadUserSession(userAccount);
         setIsAuthenticated(true);
+      } else if (activeLocal) {
+        loadUserSession(activeLocal);
+        setIsAuthenticated(true);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const activeLocal = userDB.getActiveUser();
+
       if (event === 'SIGNED_IN' && session?.user) {
         const cloudData = await cloudTradingService.fetchCloudUserData(session.user.id);
         const userAccount: UserAccount = {
           id: session.user.id,
-          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Trader',
-          email: session.user.email || '',
+          username: session.user.user_metadata?.username || (activeLocal?.id === session.user.id ? activeLocal.username : null) || session.user.email?.split('@')[0] || 'Trader',
+          email: session.user.email || activeLocal?.email || '',
           createdAt: new Date().toLocaleDateString('en-US'),
-          profile: cloudData?.profile || {
+          profile: cloudData?.profile || (activeLocal?.id === session.user.id ? activeLocal.profile : null) || {
             name: session.user.user_metadata?.full_name || 'Trader',
             email: session.user.email || '',
             memberSince: '2025',
             plan: 'Paper Trading Pro',
           },
           data: {
-            cash: cloudData?.cash ?? 10000,
-            buyingPower: cloudData?.buyingPower ?? 10000,
-            holdings: cloudData?.holdings || [],
-            orders: cloudData?.orders || [],
-            transactions: cloudData?.transactions || [],
-            settings: {
+            cash: cloudData?.cash ?? (activeLocal?.id === session.user.id ? activeLocal.data.cash : 10000),
+            buyingPower: cloudData?.buyingPower ?? (activeLocal?.id === session.user.id ? activeLocal.data.buyingPower : 10000),
+            holdings: (cloudData?.holdings && cloudData.holdings.length > 0) ? cloudData.holdings : (activeLocal?.id === session.user.id ? activeLocal.data.holdings : []),
+            orders: (cloudData?.orders && cloudData.orders.length > 0) ? cloudData.orders : (activeLocal?.id === session.user.id ? activeLocal.data.orders : []),
+            transactions: (cloudData?.transactions && cloudData.transactions.length > 0) ? cloudData.transactions : (activeLocal?.id === session.user.id ? activeLocal.data.transactions : []),
+            settings: activeLocal?.data.settings || {
               siteDashboardUrl: 'https://nexora.com/dashboard',
               defaultLandingPage: 'Portfolio',
               timezone: '(GMT+05:30) Asia/Kolkata',

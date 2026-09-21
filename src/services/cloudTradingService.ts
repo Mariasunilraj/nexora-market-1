@@ -31,6 +31,10 @@ export class CloudTradingService {
         console.warn('Cloud profile fetch warning:', profileErr);
       }
 
+      if (!profileRow) {
+        return null;
+      }
+
       const virtualCash = profileRow?.virtual_cash !== undefined ? Number(profileRow.virtual_cash) : 10000;
       const buyingPower = profileRow?.buying_power !== undefined ? Number(profileRow.buying_power) : virtualCash;
 
