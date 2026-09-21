@@ -28,7 +28,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 }) => {
   const [view, setView] = useState<'login' | 'register' | 'signed-out' | 'forgot-password'>(initialView);
 
-  // Login form states (clean, no default pre-fill)
+  // Login form states
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
@@ -178,63 +178,57 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#070D1F] flex items-center justify-center p-4 relative overflow-hidden text-slate-100 font-sans">
-      {/* Background Decorative Lighting */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen bg-slate-100 dark:bg-[#121214] flex items-center justify-center p-4 relative overflow-hidden text-slate-900 dark:text-slate-100 font-sans">
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 flex items-center justify-center shadow-xl shadow-emerald-500/20">
-            <div className="w-full h-full bg-[#0B132B] rounded-[14px] flex items-center justify-center">
-              <span className="text-emerald-400 font-black text-xl tracking-tighter">m</span>
-            </div>
+          <div className="w-9 h-9 bg-blue-600 dark:bg-[#3B82F6] flex items-center justify-center text-white font-mono font-bold text-lg">
+            N
           </div>
-          <h1 className="text-2xl font-black tracking-widest text-white">NEXORA</h1>
+          <h1 className="text-xl font-bold tracking-widest text-slate-900 dark:text-white uppercase">NEXORA</h1>
         </div>
 
         {/* Global Error Banner */}
         {errorMsg && (
-          <div className="mb-4 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+          <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-500" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {/* Global Success Banner */}
         {successMsg && (
-          <div className="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+          <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
             <span>{successMsg}</span>
           </div>
         )}
 
         {/* 1. Signed Out View */}
         {view === 'signed-out' && (
-          <div className="bg-[#0B132B] border border-[#1C2951] rounded-3xl p-8 shadow-2xl text-center space-y-6 animate-in fade-in zoom-in duration-200">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center mx-auto text-blue-400 shadow-inner">
-              <LogOut className="w-8 h-8" />
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-8 shadow-none text-center space-y-6 animate-in fade-in duration-200">
+            <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto text-blue-600 dark:text-[#3B82F6]">
+              <LogOut className="w-6 h-6" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-lg font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                 You have signed out
               </h2>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
-                Your portfolio, orders, transactions, and settings have been safely preserved in the database.
+              <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed">
+                Your portfolio, orders, transactions, and settings have been safely preserved.
               </p>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[#111C3A] border border-[#1C2951] flex items-center justify-center gap-2 text-xs text-slate-300 font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="p-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-center gap-2 text-xs text-slate-700 dark:text-zinc-300 font-medium">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>Data stored safely in database</span>
             </div>
 
             <div className="space-y-3 pt-2">
               <button
                 onClick={() => { setView('login'); setErrorMsg(null); setSuccessMsg(null); }}
-                className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
               >
                 <span>Sign In to Your Account</span>
                 <ArrowRight className="w-4 h-4" />
@@ -242,7 +236,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 onClick={() => { setView('register'); setErrorMsg(null); setSuccessMsg(null); }}
-                className="w-full py-3 px-4 bg-[#111C3A] hover:bg-[#16244C] text-slate-200 border border-[#1C2951] font-semibold text-xs rounded-xl transition-all"
+                className="w-full py-2.5 px-4 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 font-semibold text-xs uppercase tracking-wider transition-all"
               >
                 Create New Trading Account
               </button>
@@ -252,19 +246,19 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
         {/* 2. Registration View */}
         {view === 'register' && (
-          <div className="bg-[#0B132B] border border-[#1C2951] rounded-3xl p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-8 shadow-none space-y-6 animate-in fade-in duration-200">
             <div className="text-center space-y-1">
-              <h2 className="text-xl font-bold text-white tracking-tight">
+              <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                 Create Trading Account
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 Register with your credentials to start paper trading US stocks
               </p>
             </div>
 
-            <form onSubmit={handleRegister} className="space-y-4">
+            <form onSubmit={handleRegister} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   Username
                 </label>
                 <div className="relative flex items-center">
@@ -274,14 +268,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Choose a username"
                     value={regUsername}
                     onChange={(e) => setRegUsername(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <User className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   Gmail / Email Address
                 </label>
                 <div className="relative flex items-center">
@@ -291,14 +285,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="name@gmail.com"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   Password
                 </label>
                 <div className="relative flex items-center">
@@ -308,7 +302,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Create a secure password"
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 pr-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                   <button
@@ -322,7 +316,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   Confirm Password
                 </label>
                 <div className="relative flex items-center">
@@ -332,7 +326,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Re-enter your password"
                     value={regConfirmPassword}
                     onChange={(e) => setRegConfirmPassword(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                 </div>
@@ -340,18 +334,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
               >
-                Register Account ($50,000 USD Free)
+                Register Account ($50,000 Free Cash)
               </button>
             </form>
 
             <div className="text-center pt-2">
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 Already have an account?{' '}
                 <button
                   onClick={() => { setView('login'); setErrorMsg(null); setSuccessMsg(null); }}
-                  className="text-blue-400 hover:underline font-bold"
+                  className="text-blue-600 dark:text-[#3B82F6] hover:underline font-semibold uppercase tracking-wider"
                 >
                   Sign In
                 </button>
@@ -360,21 +354,21 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           </div>
         )}
 
-        {/* 3. Login View (with Forgot Password & OTP integration) */}
+        {/* 3. Login View */}
         {view === 'login' && (
-          <div className="bg-[#0B132B] border border-[#1C2951] rounded-3xl p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-8 shadow-none space-y-6 animate-in fade-in duration-200">
             <div className="text-center space-y-1">
-              <h2 className="text-xl font-bold text-white tracking-tight">
+              <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                 Sign In to NEXORA
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 Enter your credentials to access your trading workstation
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                   Email Address or Username
                 </label>
                 <div className="relative flex items-center">
@@ -384,7 +378,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Enter your email or username"
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                 </div>
@@ -392,7 +386,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">
+                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400">
                     Password
                   </label>
                   <button
@@ -404,7 +398,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       setSuccessMsg(null);
                       setForgotIdentifier(loginIdentifier);
                     }}
-                    className="text-xs text-blue-400 hover:text-blue-300 font-semibold hover:underline"
+                    className="text-[11px] text-blue-600 dark:text-[#3B82F6] hover:underline uppercase tracking-wider font-semibold"
                   >
                     Forgot password?
                   </button>
@@ -416,7 +410,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Enter your password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 pr-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                   <button
@@ -431,7 +425,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
               >
                 <span>Sign In</span>
                 <ArrowRight className="w-4 h-4" />
@@ -439,11 +433,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             </form>
 
             <div className="text-center pt-2">
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 Don't have an account?{' '}
                 <button
                   onClick={() => { setView('register'); setErrorMsg(null); setSuccessMsg(null); }}
-                  className="text-emerald-400 hover:underline font-bold"
+                  className="text-blue-600 dark:text-[#3B82F6] hover:underline font-semibold uppercase tracking-wider"
                 >
                   Register New Account
                 </button>
@@ -454,16 +448,16 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
         {/* 4. Forgot Password & OTP Verification View */}
         {view === 'forgot-password' && (
-          <div className="bg-[#0B132B] border border-[#1C2951] rounded-3xl p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-8 shadow-none space-y-6 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => { setView('login'); setErrorMsg(null); setSuccessMsg(null); }}
-                className="p-2 -ml-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                className="p-1 -ml-1 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Sign In</span>
               </button>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-950/60 text-blue-400 border border-blue-800/60">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-[#3B82F6] border border-blue-500/20">
                 Step {forgotStep === 'email' ? '1 of 3' : forgotStep === 'otp' ? '2 of 3' : '3 of 3'}
               </span>
             </div>
@@ -472,20 +466,20 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             {forgotStep === 'email' && (
               <div className="space-y-4">
                 <div className="text-center space-y-1">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/30 flex items-center justify-center mx-auto text-blue-400 mb-3">
-                    <KeyRound className="w-6 h-6" />
+                  <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto text-blue-600 dark:text-[#3B82F6] mb-3">
+                    <KeyRound className="w-5 h-5" />
                   </div>
-                  <h2 className="text-xl font-bold text-white tracking-tight">
+                  <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                     Reset Password
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 dark:text-zinc-400">
                     Enter your registered Gmail ID or Username. We will dispatch a 6-digit OTP verification code to your email.
                   </p>
                 </div>
 
-                <form onSubmit={handleRequestOtp} className="space-y-4">
+                <form onSubmit={handleRequestOtp} className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                       Registered Email or Username
                     </label>
                     <div className="relative flex items-center">
@@ -495,7 +489,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         placeholder="Enter your email or username"
                         value={forgotIdentifier}
                         onChange={(e) => setForgotIdentifier(e.target.value)}
-                        className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                        className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                       />
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                     </div>
@@ -503,7 +497,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                   >
                     <span>Send Verification Code</span>
                     <Send className="w-4 h-4" />
@@ -516,35 +510,35 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             {forgotStep === 'otp' && (
               <div className="space-y-4">
                 <div className="text-center space-y-1">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 mb-3">
-                    <Mail className="w-6 h-6" />
+                  <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-500 mb-3">
+                    <Mail className="w-5 h-5" />
                   </div>
-                  <h2 className="text-xl font-bold text-white tracking-tight">
+                  <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                     Verify 6-Digit OTP
                   </h2>
-                  <p className="text-xs text-slate-400">
-                    A 6-digit code has been sent to <strong className="text-blue-400">{otpTargetEmail}</strong>.
+                  <p className="text-xs text-slate-500 dark:text-zinc-400">
+                    A 6-digit code has been sent to <strong className="text-blue-600 dark:text-[#3B82F6]">{otpTargetEmail}</strong>.
                   </p>
                 </div>
 
                 {/* Simulated High-Security Email Dispatch Alert */}
                 {dispatchedOtpPreview && (
-                  <div className="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/40 space-y-1 text-center animate-in fade-in">
-                    <span className="text-[11px] font-semibold text-blue-300 block">
+                  <div className="p-3 bg-blue-500/10 border border-blue-500/20 space-y-1 text-center animate-in fade-in">
+                    <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 block">
                       📩 Email Dispatched to {otpTargetEmail}
                     </span>
-                    <span className="text-2xl font-black font-mono tracking-widest text-emerald-400 block py-1">
+                    <span className="text-2xl font-bold font-mono tracking-widest text-emerald-600 dark:text-emerald-400 block py-1">
                       {dispatchedOtpPreview}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">
+                    <span className="text-[10px] text-slate-400 dark:text-zinc-500 block">
                       (Valid for 5 minutes. Enter this code below to reset your password)
                     </span>
                   </div>
                 )}
 
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <form onSubmit={handleVerifyOtp} className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5 text-center">
+                    <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5 text-center">
                       Enter 6-Digit Code
                     </label>
                     <input
@@ -554,26 +548,26 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                       placeholder="• • • • • •"
                       value={enteredOtp}
                       onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
-                      className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl py-3 text-center text-2xl font-mono font-bold tracking-widest text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                      className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 py-2.5 text-center text-2xl font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all"
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
                   >
                     Verify Code
                   </button>
                 </form>
 
                 <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-slate-400">Didn't receive code?</span>
+                  <span className="text-slate-500 dark:text-zinc-400">Didn't receive code?</span>
                   <button
                     type="button"
                     onClick={handleResendOtp}
                     disabled={resendTimer > 0}
-                    className={`font-bold flex items-center gap-1 ${
-                      resendTimer > 0 ? 'text-slate-500 cursor-not-allowed' : 'text-blue-400 hover:underline'
+                    className={`font-semibold uppercase tracking-wider flex items-center gap-1 ${
+                      resendTimer > 0 ? 'text-slate-400 dark:text-zinc-600 cursor-not-allowed' : 'text-blue-600 dark:text-[#3B82F6] hover:underline'
                     }`}
                   >
                     <RefreshCw className={`w-3 h-3 ${resendTimer > 0 ? 'animate-spin' : ''}`} />
@@ -587,20 +581,20 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             {forgotStep === 'new-password' && (
               <div className="space-y-4">
                 <div className="text-center space-y-1">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-600/10 border border-purple-500/30 flex items-center justify-center mx-auto text-purple-400 mb-3">
-                    <ShieldCheck className="w-6 h-6" />
+                  <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto text-blue-600 dark:text-[#3B82F6] mb-3">
+                    <ShieldCheck className="w-5 h-5" />
                   </div>
-                  <h2 className="text-xl font-bold text-white tracking-tight">
+                  <h2 className="text-base font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                     Set New Password
                   </h2>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500 dark:text-zinc-400">
                     Create a strong password for your account
                   </p>
                 </div>
 
-                <form onSubmit={handleResetPassword} className="space-y-4">
+                <form onSubmit={handleResetPassword} className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                       New Password
                     </label>
                     <div className="relative flex items-center">
@@ -610,7 +604,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         placeholder="Enter new password"
                         value={newResetPassword}
                         onChange={(e) => setNewResetPassword(e.target.value)}
-                        className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 pr-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                        className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                       />
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                       <button
@@ -624,7 +618,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">
                       Confirm New Password
                     </label>
                     <div className="relative flex items-center">
@@ -634,7 +628,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         placeholder="Re-enter new password"
                         value={confirmResetPassword}
                         onChange={(e) => setConfirmResetPassword(e.target.value)}
-                        className="w-full bg-[#111C3A] border border-[#1C2951] rounded-xl px-4 py-2.5 pl-10 text-sm font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                        className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 pl-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                       />
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                     </div>
@@ -642,7 +636,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                   >
                     <ShieldCheck className="w-4 h-4" />
                     <span>Reset Password & Sign In</span>

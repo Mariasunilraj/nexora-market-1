@@ -97,8 +97,8 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Tab Navigation */}
-      <div className="border-b border-slate-200/80 dark:border-slate-800">
-        <div className="flex space-x-6 overflow-x-auto">
+      <div className="border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex space-x-2 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -106,13 +106,13 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3.5 px-1 border-b-2 font-bold text-sm whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`py-3 px-4 font-bold text-xs uppercase tracking-wider whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${
                   isActive
-                    ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/40 dark:bg-zinc-800/60'
+                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-400'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -120,7 +120,7 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
         </div>
       </div>
 
-      {/* 4 Summary Stat Cards (Visible on all tabs for quick reference) */}
+      {/* 4 Summary Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Portfolio Value"
@@ -148,12 +148,9 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
         />
       </div>
 
-      {/* ======================================================== */}
-      {/* 1. OVERVIEW TAB                                          */}
-      {/* ======================================================== */}
+      {/* 1. OVERVIEW TAB */}
       {activeTab === 'Overview' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          {/* Charts Section */}
+        <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <PortfolioChart />
@@ -163,67 +160,66 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
             </div>
           </div>
 
-          {/* Quick Holdings Preview Table */}
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 p-5">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
                 Active Positions ({holdings.length})
               </h4>
               <button
                 onClick={() => setActiveTab('Holdings')}
-                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-wider flex items-center gap-1"
               >
-                <span>View Full Holdings Manager</span>
+                <span>Full Manager</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-slate-400 dark:text-slate-500 font-semibold text-xs border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <th className="pb-3 pl-2 font-medium">Symbol</th>
-                    <th className="pb-3 font-medium">Company</th>
-                    <th className="pb-3 font-medium text-right">Shares</th>
-                    <th className="pb-3 font-medium text-right">Avg Price</th>
-                    <th className="pb-3 font-medium text-right">Current Price</th>
-                    <th className="pb-3 font-medium text-right">Total Value</th>
-                    <th className="pb-3 font-medium text-right">P&L</th>
-                    <th className="pb-3 font-medium text-right pr-2">P&L %</th>
+                  <tr className="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                    <th className="py-2 pl-2 font-semibold">Symbol</th>
+                    <th className="py-2 font-semibold">Company</th>
+                    <th className="py-2 font-semibold text-right">Shares</th>
+                    <th className="py-2 font-semibold text-right">Avg Price</th>
+                    <th className="py-2 font-semibold text-right">Current Price</th>
+                    <th className="py-2 font-semibold text-right">Total Value</th>
+                    <th className="py-2 font-semibold text-right">P&L</th>
+                    <th className="py-2 font-semibold text-right pr-2">P&L %</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {holdings.slice(0, 5).map((h) => {
                     const isProfit = h.pnl >= 0;
                     return (
                       <tr
                         key={h.id}
-                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group cursor-pointer"
+                        className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
                         onClick={() => onNavigateToTrade && onNavigateToTrade(h.symbol)}
                       >
-                        <td className="py-4 pl-2 font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+                        <td className="py-3.5 pl-2 font-bold text-zinc-900 dark:text-white flex items-center gap-2.5">
                           <StockLogo symbol={h.symbol} size="sm" />
                           <span>{h.symbol}</span>
                         </td>
-                        <td className="py-4 text-slate-600 dark:text-slate-300">
+                        <td className="py-3.5 text-zinc-600 dark:text-zinc-400 text-xs">
                           {h.company}
                         </td>
-                        <td className="py-4 text-right text-slate-900 dark:text-white font-semibold">
+                        <td className="py-3.5 text-right font-mono font-semibold text-zinc-900 dark:text-white">
                           {h.shares}
                         </td>
-                        <td className="py-4 text-right text-slate-600 dark:text-slate-300">
+                        <td className="py-3.5 text-right font-mono text-zinc-500 dark:text-zinc-400">
                           ${h.avgPrice.toFixed(2)}
                         </td>
-                        <td className="py-4 text-right text-slate-900 dark:text-white font-semibold">
+                        <td className="py-3.5 text-right font-mono font-semibold text-zinc-900 dark:text-white">
                           ${h.currentPrice.toFixed(2)}
                         </td>
-                        <td className="py-4 text-right text-slate-900 dark:text-white font-bold">
+                        <td className="py-3.5 text-right font-mono font-bold text-zinc-900 dark:text-white">
                           ${h.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-                        <td className={`py-4 text-right font-semibold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        <td className={`py-3.5 text-right font-mono font-semibold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                           {isProfit ? `+$${h.pnl.toFixed(2)}` : `-$${Math.abs(h.pnl).toFixed(2)}`}
                         </td>
-                        <td className={`py-4 text-right pr-2 font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        <td className={`py-3.5 text-right pr-2 font-mono font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                           {isProfit ? `+${h.pnlPercent.toFixed(2)}%` : `${h.pnlPercent.toFixed(2)}%`}
                         </td>
                       </tr>
@@ -236,43 +232,35 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* 2. HOLDINGS TAB                                          */}
-      {/* ======================================================== */}
+      {/* 2. HOLDINGS TAB */}
       {activeTab === 'Holdings' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
-            {/* Search, Sort & Filters Header */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 p-6 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                  Holdings Portfolio ({filteredHoldings.length} Assets)
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
+                  Holdings Manager ({filteredHoldings.length} Assets)
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Detailed cost basis, market valuation, and unrealized profit/loss across all positions
-                </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                {/* Search Bar */}
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search by ticker or name..."
+                    placeholder="Filter ticker or name..."
                     value={holdingSearch}
                     onChange={(e) => setHoldingSearch(e.target.value)}
-                    className="bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 pl-9 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-zinc-700 px-3.5 py-2 pl-9 text-xs font-bold text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-blue-600"
                   />
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-3 pointer-events-none" />
                 </div>
 
-                {/* Sort Selector */}
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" />
                   <select
                     value={holdingSort}
                     onChange={(e) => setHoldingSort(e.target.value as any)}
-                    className="bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none"
+                    className="bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-xs font-bold text-zinc-900 dark:text-white focus:outline-none"
                   >
                     <option value="value">Highest Total Value</option>
                     <option value="pnl">Highest P&L ($)</option>
@@ -283,26 +271,25 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
               </div>
             </div>
 
-            {/* Holdings Detailed Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-slate-400 dark:text-slate-500 font-semibold text-xs border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <th className="pb-3 pl-2 font-medium">Asset</th>
-                    <th className="pb-3 font-medium text-right">Shares</th>
-                    <th className="pb-3 font-medium text-right">Avg Cost</th>
-                    <th className="pb-3 font-medium text-right">Market Price</th>
-                    <th className="pb-3 font-medium text-right">Market Value</th>
-                    <th className="pb-3 font-medium text-right">Weight</th>
-                    <th className="pb-3 font-medium text-right">Unrealized P&L</th>
-                    <th className="pb-3 font-medium text-right">P&L %</th>
-                    <th className="pb-3 font-medium text-right pr-2">Action</th>
+                  <tr className="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                    <th className="py-2 pl-2 font-semibold">Asset</th>
+                    <th className="py-2 font-semibold text-right">Shares</th>
+                    <th className="py-2 font-semibold text-right">Avg Cost</th>
+                    <th className="py-2 font-semibold text-right">Market Price</th>
+                    <th className="py-2 font-semibold text-right">Market Value</th>
+                    <th className="py-2 font-semibold text-right">Weight</th>
+                    <th className="py-2 font-semibold text-right">Unrealized P&L</th>
+                    <th className="py-2 font-semibold text-right">P&L %</th>
+                    <th className="py-2 font-semibold text-right pr-2">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {filteredHoldings.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="py-8 text-center text-xs text-slate-400">
+                      <td colSpan={9} className="py-8 text-center text-xs text-zinc-400">
                         No holdings found matching "{holdingSearch}".
                       </td>
                     </tr>
@@ -313,42 +300,42 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
                       return (
                         <tr
                           key={h.id}
-                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
+                          className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                         >
-                          <td className="py-4 pl-2 font-bold text-slate-900 dark:text-white">
+                          <td className="py-3.5 pl-2 font-bold text-zinc-900 dark:text-white">
                             <div className="flex items-center gap-2.5">
                               <StockLogo symbol={h.symbol} size="sm" />
                               <div>
-                                <p className="font-bold text-slate-900 dark:text-white">{h.symbol}</p>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400">{h.company}</p>
+                                <p className="font-bold text-zinc-900 dark:text-white">{h.symbol}</p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{h.company}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 text-right text-slate-900 dark:text-white font-semibold">
+                          <td className="py-3.5 text-right font-mono font-semibold text-zinc-900 dark:text-white">
                             {h.shares}
                           </td>
-                          <td className="py-4 text-right text-slate-600 dark:text-slate-300">
+                          <td className="py-3.5 text-right font-mono text-zinc-500 dark:text-zinc-400">
                             ${h.avgPrice.toFixed(2)}
                           </td>
-                          <td className="py-4 text-right text-slate-900 dark:text-white font-semibold">
+                          <td className="py-3.5 text-right font-mono font-semibold text-zinc-900 dark:text-white">
                             ${h.currentPrice.toFixed(2)}
                           </td>
-                          <td className="py-4 text-right text-slate-900 dark:text-white font-bold">
+                          <td className="py-3.5 text-right font-mono font-bold text-zinc-900 dark:text-white">
                             ${h.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
-                          <td className="py-4 text-right font-mono text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          <td className="py-3.5 text-right font-mono text-xs text-zinc-600 dark:text-zinc-400">
                             {weightPct}%
                           </td>
-                          <td className={`py-4 text-right font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          <td className={`py-3.5 text-right font-mono font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {isProfit ? `+$${h.pnl.toFixed(2)}` : `-$${Math.abs(h.pnl).toFixed(2)}`}
                           </td>
-                          <td className={`py-4 text-right font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          <td className={`py-3.5 text-right font-mono font-bold ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {isProfit ? `+${h.pnlPercent.toFixed(2)}%` : `${h.pnlPercent.toFixed(2)}%`}
                           </td>
-                          <td className="py-4 text-right pr-2">
+                          <td className="py-3.5 text-right pr-2">
                             <button
                               onClick={() => onNavigateToTrade && onNavigateToTrade(h.symbol)}
-                              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 dark:text-blue-400 transition-colors"
+                              className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-blue-50 hover:bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors"
                             >
                               Trade
                             </button>
@@ -364,107 +351,68 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* 3. PERFORMANCE TAB                                       */}
-      {/* ======================================================== */}
+      {/* 3. PERFORMANCE TAB */}
       {activeTab === 'Performance' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          {/* Main Full-Width Performance Chart */}
+        <div className="space-y-6">
           <PortfolioChart />
 
-          {/* Performance Deep-Dive Metrics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Total Return (ROI)</span>
-              <p className={`text-2xl font-black ${totalPnL >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <div className="p-5 bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total Return (ROI)</span>
+              <p className={`text-2xl font-mono font-bold ${totalPnL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                 {totalPnL >= 0 ? '+' : ''}{totalPnLPercent.toFixed(2)}%
               </p>
-              <p className="text-[11px] text-slate-400">Net dollar profit: {formatCurrency(totalPnL, true)}</p>
+              <p className="text-[11px] font-mono text-zinc-400">Net Dollar Profit: {formatCurrency(totalPnL, true)}</p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Win Rate (% Profitable Positions)</span>
-              <p className="text-2xl font-black text-blue-500">
+            <div className="p-5 bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Win Rate (% Profitable)</span>
+              <p className="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400">
                 {winRate.toFixed(1)}%
               </p>
-              <p className="text-[11px] text-slate-400">{profitableHoldingsCount} of {holdings.length} holdings in green profit</p>
+              <p className="text-[11px] text-zinc-400">{profitableHoldingsCount} of {holdings.length} positions in profit</p>
             </div>
 
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Estimated Sharpe Ratio</span>
-              <p className="text-2xl font-black text-purple-500">
-                1.84 <span className="text-xs font-bold text-slate-400">(Strong)</span>
+            <div className="p-5 bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Sharpe Ratio</span>
+              <p className="text-2xl font-mono font-bold text-zinc-900 dark:text-white">
+                1.84 <span className="text-xs font-normal text-zinc-400">(Optimal)</span>
               </p>
-              <p className="text-[11px] text-slate-400">Risk-adjusted return vs benchmark risk-free rate</p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Max Portfolio Drawdown</span>
-              <p className="text-2xl font-black text-emerald-500">
-                -3.20% <span className="text-xs font-bold text-slate-400">(Low Risk)</span>
-              </p>
-              <p className="text-[11px] text-slate-400">Peak-to-trough maximum paper decline</p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Top Performing Asset</span>
-              <p className="text-2xl font-black text-emerald-500">
-                {bestPerformer ? `${bestPerformer.symbol} (+${bestPerformer.pnlPercent.toFixed(2)}%)` : 'N/A'}
-              </p>
-              <p className="text-[11px] text-slate-400">{bestPerformer ? bestPerformer.company : 'No active holdings'}</p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Alpha vs S&P 500</span>
-              <p className="text-2xl font-black text-cyan-500">
-                +4.12%
-              </p>
-              <p className="text-[11px] text-slate-400">Outperforming SPY over current simulation period</p>
+              <p className="text-[11px] text-zinc-400">Risk-adjusted return vs benchmark</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* 4. ASSET ALLOCATION TAB                                  */}
-      {/* ======================================================== */}
+      {/* 4. ASSET ALLOCATION TAB */}
       {activeTab === 'Asset Allocation' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Donut Chart */}
             <div className="lg:col-span-1">
               <AllocationDonut />
             </div>
 
-            {/* Right: Allocation Breakdown Ledger */}
-            <div className="lg:col-span-2 bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                    Portfolio Allocation & Weight Breakdown
-                  </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Asset weighting, sector diversification, and concentration risk metrics
-                  </p>
-                </div>
-              </div>
+            <div className="lg:col-span-2 bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 p-6 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                Asset Allocation Ledger
+              </h4>
 
-              <div className="space-y-4">
-                {/* Cash Allocation Entry */}
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-between">
+              <div className="space-y-3">
+                {/* Cash Entry */}
+                <div className="p-3.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-md">
+                    <div className="w-8 h-8 bg-zinc-800 text-white flex items-center justify-center font-bold text-xs font-mono">
                       USD
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">Available Virtual Cash</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">Liquid Buying Power</p>
+                      <p className="text-xs font-bold text-zinc-900 dark:text-white">Available Cash</p>
+                      <p className="text-[10px] text-zinc-400">Buying Power</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs font-black text-slate-900 dark:text-white">${virtualCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                    <p className="text-[11px] font-bold text-amber-500">
-                      {totalPortfolioValue > 0 ? ((virtualCash / totalPortfolioValue) * 100).toFixed(1) : '100'}% of Portfolio
+                  <div className="text-right font-mono">
+                    <p className="text-xs font-bold text-zinc-900 dark:text-white">${virtualCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                      {totalPortfolioValue > 0 ? ((virtualCash / totalPortfolioValue) * 100).toFixed(1) : '100'}%
                     </p>
                   </div>
                 </div>
@@ -472,39 +420,26 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
                 {/* Holdings Breakdown */}
                 {holdings.map((h) => {
                   const weightPct = totalPortfolioValue > 0 ? +((h.totalValue / totalPortfolioValue) * 100).toFixed(1) : 0;
-                  const isHighConcentration = weightPct > 30;
                   return (
                     <div
                       key={h.id}
-                      className="p-4 rounded-xl bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700/60 flex items-center justify-between hover:border-blue-500/40 transition-colors"
+                      className="p-3.5 bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 flex items-center justify-between hover:border-blue-600 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <StockLogo symbol={h.symbol} size="md" />
                         <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-slate-900 dark:text-white">{h.symbol}</p>
-                            <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                              {h.category}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{h.company} • {h.shares} Shares</p>
+                          <p className="text-xs font-bold text-zinc-900 dark:text-white">{h.symbol}</p>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{h.company} • {h.shares} Shares</p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-xs font-black text-slate-900 dark:text-white">
+                      <div className="text-right font-mono">
+                        <p className="text-xs font-bold text-zinc-900 dark:text-white">
                           ${h.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
-                        <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                          <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400">
-                            {weightPct}% Weight
-                          </span>
-                          {isHighConcentration && (
-                            <span className="text-[9px] font-bold px-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
-                              Heavy
-                            </span>
-                          )}
-                        </div>
+                        <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                          {weightPct}% Weight
+                        </span>
                       </div>
                     </div>
                   );
@@ -515,40 +450,30 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* 5. HISTORY TAB                                           */}
-      {/* ======================================================== */}
+      {/* 5. HISTORY TAB */}
       {activeTab === 'History' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-5">
-            {/* Header & Filter Controls */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                  Portfolio Transaction Ledger ({filteredTransactions.length})
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Complete historical record of all executed buy/sell trades, virtual deposits, and adjustments
-                </p>
-              </div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
+                Transaction Ledger ({filteredTransactions.length})
+              </h4>
 
               <div className="flex flex-wrap items-center gap-3">
-                {/* Search */}
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search history..."
                     value={historySearch}
                     onChange={(e) => setHistorySearch(e.target.value)}
-                    className="bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 pl-9 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-zinc-700 px-3.5 py-1.5 pl-9 text-xs font-bold text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-blue-600"
                   />
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5 pointer-events-none" />
                 </div>
 
-                {/* Export CSV Button */}
                 <button
                   onClick={handleExportCSV}
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Export CSV</span>
@@ -556,16 +481,15 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
               </div>
             </div>
 
-            {/* Transaction Type Filter Pills */}
             <div className="flex flex-wrap items-center gap-2">
               {(['All', 'Buy', 'Sell', 'Deposit', 'Dividend'] as const).map((type) => (
                 <button
                   key={type}
                   onClick={() => setHistoryFilter(type)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-all ${
                     historyFilter === type
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                      : 'bg-slate-100 dark:bg-[#111C3A] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700'
                   }`}
                 >
                   {type}
@@ -573,23 +497,22 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
               ))}
             </div>
 
-            {/* Transaction History Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-slate-400 dark:text-slate-500 font-semibold text-xs border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <th className="pb-3 pl-2 font-medium">Date & Time</th>
-                    <th className="pb-3 font-medium">Type</th>
-                    <th className="pb-3 font-medium">Description</th>
-                    <th className="pb-3 font-medium text-right">Net Amount</th>
-                    <th className="pb-3 font-medium text-right pr-2">Cash Balance</th>
+                  <tr className="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                    <th className="py-2 pl-2 font-semibold">Date & Time</th>
+                    <th className="py-2 font-semibold">Type</th>
+                    <th className="py-2 font-semibold">Description</th>
+                    <th className="py-2 font-semibold text-right">Amount</th>
+                    <th className="py-2 font-semibold text-right pr-2">Cash Balance</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {filteredTransactions.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-xs text-slate-400">
-                        No transactions found matching your criteria.
+                      <td colSpan={5} className="py-8 text-center text-xs text-zinc-400">
+                        No transactions found matching criteria.
                       </td>
                     </tr>
                   ) : (
@@ -598,33 +521,31 @@ export const PortfolioPage: React.FC<PortfolioPageProps> = ({ onNavigateToTrade 
                       return (
                         <tr
                           key={t.id}
-                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                          className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                         >
-                          <td className="py-4 pl-2 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                          <td className="py-3 pl-2 text-xs font-mono text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                             {t.date}
                           </td>
-                          <td className="py-4">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
                               t.type === 'Buy'
-                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300'
+                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                                 : t.type === 'Sell'
-                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
-                                : t.type === 'Deposit'
-                                ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300'
-                                : 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                                : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
                             }`}>
                               {t.type}
                             </span>
                           </td>
-                          <td className="py-4 font-bold text-slate-900 dark:text-white">
+                          <td className="py-3 font-bold text-zinc-900 dark:text-white">
                             {t.description}
                           </td>
-                          <td className={`py-4 text-right font-black ${
-                            isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'
+                          <td className={`py-3 text-right font-mono font-bold ${
+                            isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-900 dark:text-white'
                           }`}>
                             {isPositive ? `+$${t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : `-$${Math.abs(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                           </td>
-                          <td className="py-4 text-right pr-2 text-xs font-mono font-semibold text-slate-500 dark:text-slate-400">
+                          <td className="py-3 text-right pr-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
                             ${t.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </td>
                         </tr>

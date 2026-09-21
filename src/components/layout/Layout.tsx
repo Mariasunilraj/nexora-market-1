@@ -52,7 +52,7 @@ export const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex bg-[#F8FAFC] dark:bg-[#070D1F] text-slate-900 dark:text-slate-100 transition-colors duration-150 relative">
+    <div className="min-h-screen flex bg-white dark:bg-[#18181B] text-zinc-900 dark:text-zinc-100 transition-colors duration-150 relative">
       {/* Mobile Drawer & Desktop Sidebar */}
       <Sidebar
         activePage={activePage}
@@ -81,21 +81,21 @@ export const Layout: React.FC<LayoutProps> = ({
         title="Confirm Sign Out"
       >
         <div className="space-y-4">
-          <p className="text-xs text-slate-600 dark:text-slate-400">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
             Are you sure you want to sign out? Your simulated trading portfolio and positions are safely saved in the database.
           </p>
           <div className="flex gap-3">
             <button
               onClick={() => setIsLogoutModalOpen(false)}
-              className="flex-1 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800"
+              className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
-              Stay Logged In
+              Cancel
             </button>
             <button
               onClick={handleConfirmLogout}
-              className="flex-1 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-md transition-colors"
+              className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-700 transition-colors"
             >
-              Yes, Sign Out
+              Sign Out
             </button>
           </div>
         </div>

@@ -7,9 +7,6 @@ import {
   BarChart2,
   Layers,
   Radio,
-  TrendingUp,
-  TrendingDown,
-  LineChart,
 } from 'lucide-react';
 import { finnhubClient, CandleData } from '../../services/finnhubService';
 
@@ -94,7 +91,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
       if (candles && candles.length > 0) {
         setNativeCandles(candles);
       } else {
-        // Fallback smooth series
         const generated = generateFallbackCandles(currentPrice, 36);
         setNativeCandles(generated);
       }
@@ -110,7 +106,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     }
   }, [currentPrice]);
 
-  // Helper generator for ultra-smooth fallback candles
   function generateFallbackCandles(base: number, count: number): CandleData[] {
     const candles: CandleData[] = [];
     let cur = base * 0.94;
@@ -139,7 +134,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     return candles;
   }
 
-  // Timer for loading elapsed indicator
   useEffect(() => {
     let interval: any;
     if (isLoading) {
@@ -189,8 +183,8 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
       hide_top_toolbar: false,
       hide_legend: false,
       hide_volume: false,
-      backgroundColor: theme === 'dark' ? '#0B132B' : '#FFFFFF',
-      gridColor: theme === 'dark' ? 'rgba(28, 41, 81, 0.4)' : 'rgba(226, 232, 240, 0.8)',
+      backgroundColor: theme === 'dark' ? '#18181B' : '#FFFFFF',
+      gridColor: theme === 'dark' ? 'rgba(39, 39, 42, 0.6)' : 'rgba(228, 228, 231, 0.8)',
       watchlist: ['NASDAQ:AAPL', 'NASDAQ:MSFT', 'NASDAQ:TSLA', 'NASDAQ:NVDA', 'NASDAQ:GOOGL', 'NASDAQ:AMZN'],
       withdateranges: true,
       compareSymbols: [],
@@ -227,7 +221,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     };
   }, [formattedSymbol, cleanSymbol, theme, engine, reloadKey, loadNativeCandles, nativeTimeframe]);
 
-  // Rerun when timeframe or stock changes in native mode
   useEffect(() => {
     if (engine === 'native') {
       loadNativeCandles(cleanSymbol, nativeTimeframe);
@@ -238,7 +231,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
     setReloadKey(k => k + 1);
   };
 
-  // Calculations for Native SVG Viewport
   const displayedCandles = useMemo(() => {
     if (nativeCandles.length > 0) return nativeCandles;
     return generateFallbackCandles(currentPrice, 36);
@@ -273,7 +265,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   const candleSpacing = (svgWidth - 90) / (displayedCandles.length || 1);
   const candleWidth = Math.max(5, candleSpacing - 4);
 
-  // Moving Averages calculation (EMA 20 & SMA 50)
   const ema20Points = useMemo(() => {
     const k = 2 / (20 + 1);
     let ema = displayedCandles[0]?.close || currentPrice;
@@ -300,14 +291,12 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   const candleChange = +(activeCandle.close - activeCandle.open).toFixed(2);
   const candleChangePct = +((candleChange / (activeCandle.open || 1)) * 100).toFixed(2);
 
-  // Mouse move handler for interactive crosshair
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     const clientX = e.clientX - rect.left;
     const clientY = e.clientY - rect.top;
     
-    // Scale to SVG coordinates
     const scaleX = svgWidth / rect.width;
     const scaleY = svgHeight / rect.height;
     const svgX = clientX * scaleX;
@@ -315,7 +304,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
     setMousePos({ x: svgX, y: svgY });
 
-    // Find nearest candle
     const index = Math.floor((svgX - 20) / candleSpacing);
     if (index >= 0 && index < displayedCandles.length) {
       setHoveredIndex(index);
@@ -330,23 +318,23 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   };
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200/80 dark:border-[#1C2951] bg-white dark:bg-[#0B132B] shadow-lg transition-colors flex flex-col">
+    <div className="relative w-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181B] transition-colors flex flex-col">
       {/* 1. TOP INTERACTIVE STATUS & ENGINE CONTROL BAR */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-50/90 dark:bg-[#0E1738] border-b border-slate-200 dark:border-[#1C2951] z-10">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-zinc-50 dark:bg-[#121214] border-b border-zinc-200 dark:border-zinc-800 z-10">
         {/* Left: Symbol Badge & Engine Switcher */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
             <Layers className="w-3.5 h-3.5" />
             {formattedSymbol}
           </span>
 
-          <div className="flex items-center bg-slate-200/70 dark:bg-[#111C3A] p-0.5 rounded-lg border border-slate-300 dark:border-[#1C2951] text-xs font-semibold">
+          <div className="flex items-center bg-zinc-200/80 dark:bg-zinc-800 p-0.5 border border-zinc-300 dark:border-zinc-700 text-xs font-semibold">
             <button
               onClick={() => setEngine('tradingview')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1 uppercase tracking-wider transition-all ${
                 engine === 'tradingview'
-                  ? 'bg-blue-600 text-white shadow-sm font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-blue-600 dark:bg-blue-600 text-white font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <Zap className="w-3 h-3" />
@@ -354,10 +342,10 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
             </button>
             <button
               onClick={() => setEngine('native')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1 uppercase tracking-wider transition-all ${
                 engine === 'native'
-                  ? 'bg-purple-600 text-white shadow-sm font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-blue-600 dark:bg-blue-600 text-white font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
               }`}
             >
               <BarChart2 className="w-3 h-3" />
@@ -368,12 +356,12 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
         {/* Right: Live Status Indicator & Action Tools */}
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+          <div className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold border transition-all ${
             isLoading
               ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-800'
               : isFeedOk
                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300'
+                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-300'
           }`}>
             {isLoading ? (
               <>
@@ -383,11 +371,11 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
             ) : isFeedOk ? (
               <>
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 bg-emerald-500"></span>
                 </span>
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="tracking-tight">Chart Status: OK • Live Feed</span>
+                <span className="tracking-tight uppercase text-[10px]">Status: OK • Live Feed</span>
               </>
             ) : (
               <span>Ready</span>
@@ -397,7 +385,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
           <button
             onClick={handleManualReload}
             title="Reload Chart Data"
-            className="p-1.5 rounded-lg bg-white dark:bg-[#111C3A] border border-slate-200 dark:border-[#1C2951] text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+            className="p-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-white transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -407,32 +395,27 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
       {/* 2. LOADING SCREEN OVERLAY */}
       {isLoading && (
         <div
-          className="absolute inset-x-0 top-[48px] bottom-0 z-20 flex flex-col items-center justify-center bg-white/95 dark:bg-[#0B132B]/95 backdrop-blur-sm transition-all p-6 text-center"
+          className="absolute inset-x-0 top-[48px] bottom-0 z-20 flex flex-col items-center justify-center bg-white/95 dark:bg-[#18181B]/95 backdrop-blur-sm transition-all p-6 text-center"
         >
           <div className="relative mb-4">
-            <div className="w-14 h-14 rounded-full border-4 border-blue-500/20 border-t-blue-600 dark:border-t-blue-400 animate-spin flex items-center justify-center" />
-            <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400 absolute inset-0 m-auto animate-pulse" />
+            <div className="w-12 h-12 border-2 border-blue-500/20 border-t-blue-600 dark:border-t-blue-400 animate-spin flex items-center justify-center" />
+            <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400 absolute inset-0 m-auto animate-pulse" />
           </div>
 
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
             {statusMessage}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-            Initializing high-frequency order book and interactive technical indicators for <span className="font-bold text-blue-600 dark:text-blue-400">{formattedSymbol}</span>.
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
+            Streaming real-time order book and technical indicators for <span className="font-bold text-blue-600 dark:text-blue-400">{formattedSymbol}</span>.
           </p>
 
           <div className="mt-4 flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
-              Real-Time Feed Loading
-            </span>
-
             {engine === 'tradingview' && loadDuration > 3 && (
               <button
                 onClick={() => setEngine('native')}
-                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow-md"
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider transition-all"
               >
-                Switch to Fast Native Chart ⚡
+                Switch to Native Fast Candles ⚡
               </button>
             )}
           </div>
@@ -441,7 +424,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
       {/* 3. CHART VIEWPORT */}
       <div
-        className="w-full relative bg-white dark:bg-[#0B132B]"
+        className="w-full relative bg-white dark:bg-[#18181B]"
         style={{
           height: `${effectiveHeight - 48}px`,
           minHeight: `${effectiveHeight - 48}px`,
@@ -457,17 +440,17 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
           /* HIGH-PRECISION INTERACTIVE NATIVE CANDLESTICK ENGINE */
           <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between select-none">
             {/* Native Toolbar Header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#152042]">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               {/* Timeframes Selector */}
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#111C3A] p-1 rounded-xl border border-slate-200 dark:border-[#1C2951]">
+              <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-0.5 border border-zinc-200 dark:border-zinc-700">
                 {['1D', '1W', '1M', '3M', '1Y', '5Y', 'MAX'].map((tf) => (
                   <button
                     key={tf}
                     onClick={() => setNativeTimeframe(tf)}
-                    className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-2.5 py-1 text-xs font-mono font-bold transition-all ${
                       nativeTimeframe === tf
-                        ? 'bg-purple-600 text-white shadow-md'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     {tf}
@@ -477,19 +460,19 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
               {/* Live Interactive OHLC Ticker Readout */}
               <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
-                <span className="font-bold text-slate-700 dark:text-slate-300">
+                <span className="font-bold text-zinc-700 dark:text-zinc-300">
                   {activeCandle.time}
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
-                  O: <span className="font-bold text-slate-900 dark:text-slate-200">${activeCandle.open.toFixed(2)}</span>
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  O: <span className="font-bold text-zinc-900 dark:text-zinc-200">${activeCandle.open.toFixed(2)}</span>
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="text-zinc-500 dark:text-zinc-400">
                   H: <span className="font-bold text-emerald-600 dark:text-emerald-400">${activeCandle.high.toFixed(2)}</span>
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="text-zinc-500 dark:text-zinc-400">
                   L: <span className="font-bold text-rose-600 dark:text-rose-400">${activeCandle.low.toFixed(2)}</span>
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="text-zinc-500 dark:text-zinc-400">
                   C: <span className={`font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>${activeCandle.close.toFixed(2)}</span>
                 </span>
                 <span className={`font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
@@ -499,27 +482,27 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
               {/* Chart Mode & Indicator Toggles */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-slate-100 dark:bg-[#111C3A] p-0.5 rounded-lg border border-slate-200 dark:border-[#1C2951] text-xs">
+                <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-0.5 border border-zinc-200 dark:border-zinc-700 text-xs">
                   <button
                     onClick={() => setNativeChartType('candles')}
-                    className={`px-2 py-1 rounded font-semibold transition-all ${
-                      nativeChartType === 'candles' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500'
+                    className={`px-2 py-1 uppercase tracking-wider font-bold transition-all ${
+                      nativeChartType === 'candles' ? 'bg-blue-600 text-white' : 'text-zinc-500'
                     }`}
                   >
                     Candles
                   </button>
                   <button
                     onClick={() => setNativeChartType('line')}
-                    className={`px-2 py-1 rounded font-semibold transition-all ${
-                      nativeChartType === 'line' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500'
+                    className={`px-2 py-1 uppercase tracking-wider font-bold transition-all ${
+                      nativeChartType === 'line' ? 'bg-blue-600 text-white' : 'text-zinc-500'
                     }`}
                   >
                     Line
                   </button>
                   <button
                     onClick={() => setNativeChartType('area')}
-                    className={`px-2 py-1 rounded font-semibold transition-all ${
-                      nativeChartType === 'area' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500'
+                    className={`px-2 py-1 uppercase tracking-wider font-bold transition-all ${
+                      nativeChartType === 'area' ? 'bg-blue-600 text-white' : 'text-zinc-500'
                     }`}
                   >
                     Area
@@ -528,13 +511,13 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
 
                 <button
                   onClick={() => setShowIndicators(!showIndicators)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
+                  className={`px-2.5 py-1 text-xs font-mono font-bold border transition-all ${
                     showIndicators
-                      ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
-                      : 'bg-slate-100 dark:bg-[#111C3A] text-slate-500 border-slate-200 dark:border-[#1C2951]'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
                   }`}
                 >
-                  EMA (20)
+                  EMA 20
                 </button>
               </div>
             </div>
@@ -551,7 +534,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
               >
                 <defs>
                   <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.35" />
                     <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
@@ -567,8 +550,8 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                         y1={y}
                         x2={svgWidth - 75}
                         y2={y}
-                        stroke={theme === 'dark' ? '#16244C' : '#E2E8F0'}
-                        strokeDasharray="3 3"
+                        stroke={theme === 'dark' ? '#27272A' : '#E4E4E7'}
+                        strokeDasharray="2 2"
                         strokeWidth="1"
                       />
                     </g>
@@ -590,7 +573,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                       width={candleWidth}
                       height={barHeight}
                       fill={candleIsUp ? '#10B981' : '#EF4444'}
-                      opacity={theme === 'dark' ? 0.3 : 0.2}
+                      opacity={theme === 'dark' ? 0.35 : 0.25}
                     />
                   );
                 })}
@@ -614,7 +597,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                       }, '')}
                       fill="none"
                       stroke="#3B82F6"
-                      strokeWidth="2.5"
+                      strokeWidth="2"
                     />
                   </>
                 )}
@@ -629,7 +612,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                     }, '')}
                     fill="none"
                     stroke="#3B82F6"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                   />
                 )}
 
@@ -656,7 +639,7 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                         x2={centerX}
                         y2={lowY}
                         stroke={color}
-                        strokeWidth={isHovered ? '2.5' : '1.5'}
+                        strokeWidth={isHovered ? '2' : '1.2'}
                       />
                       {/* Real Candle Body */}
                       <rect
@@ -667,7 +650,6 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                         fill={color}
                         stroke={color}
                         strokeWidth="1"
-                        rx="1"
                         opacity={isHovered ? 1 : 0.9}
                       />
                     </g>
@@ -681,43 +663,39 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                       return idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`;
                     }, '')}
                     fill="none"
-                    stroke="#00D2FF"
-                    strokeWidth="1.75"
-                    strokeDasharray="4 2"
+                    stroke="#38BDF8"
+                    strokeWidth="1.5"
+                    strokeDasharray="3 2"
                   />
                 )}
 
                 {/* Interactive Crosshair & Tooltip Overlay */}
                 {mousePos && hoveredIndex !== null && (
                   <g>
-                    {/* Vertical line at mouse X */}
                     <line
                       x1={hoveredIndex * candleSpacing + 20 + candleWidth / 2}
                       y1={chartTop}
                       x2={hoveredIndex * candleSpacing + 20 + candleWidth / 2}
                       y2={chartBottom}
-                      stroke="#818CF8"
-                      strokeDasharray="3 3"
-                      strokeWidth="1.5"
+                      stroke="#3B82F6"
+                      strokeDasharray="2 2"
+                      strokeWidth="1.2"
                     />
-                    {/* Horizontal line at mouse Y */}
                     <line
                       x1="0"
                       y1={mousePos.y}
                       x2={svgWidth - 75}
                       y2={mousePos.y}
-                      stroke="#818CF8"
-                      strokeDasharray="3 3"
-                      strokeWidth="1.5"
+                      stroke="#3B82F6"
+                      strokeDasharray="2 2"
+                      strokeWidth="1.2"
                     />
-                    {/* Floating Price Pill on Right Axis */}
                     <rect
                       x={svgWidth - 75}
                       y={mousePos.y - 10}
                       width="70"
                       height="20"
-                      fill="#6366F1"
-                      rx="4"
+                      fill="#2563EB"
                     />
                     <text
                       x={svgWidth - 40}
@@ -741,16 +719,16 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
                   y2={getY(currentPrice)}
                   stroke="#10B981"
                   strokeDasharray="2 2"
-                  strokeWidth="1.5"
+                  strokeWidth="1.2"
                 />
               </svg>
 
               {/* Price Scale Y-Axis */}
-              <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-slate-200 dark:border-[#152042] flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-slate-500 dark:text-slate-400 select-none">
+              <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-zinc-200 dark:border-zinc-800 flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-zinc-500 dark:text-zinc-400 select-none">
                 <span>${maxPrice.toFixed(2)}</span>
                 <span>${((maxPrice * 0.75 + minPrice * 0.25)).toFixed(2)}</span>
                 <span>${((maxPrice + minPrice) / 2).toFixed(2)}</span>
-                <span className="bg-emerald-500 text-slate-950 px-1 py-0.5 rounded font-bold text-[10px] shadow-sm">
+                <span className="bg-emerald-600 text-white px-1 py-0.5 font-bold text-[10px]">
                   ${currentPrice.toFixed(2)}
                 </span>
                 <span>${((maxPrice * 0.25 + minPrice * 0.75)).toFixed(2)}</span>
@@ -759,15 +737,15 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
             </div>
 
             {/* Bottom Timeline & Status Footer */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-[#152042] text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
               <div className="flex gap-4 overflow-hidden">
                 {displayedCandles.filter((_, i) => i % Math.ceil(displayedCandles.length / 6) === 0).map((c, i) => (
                   <span key={i}>{c.time}</span>
                 ))}
               </div>
               <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>NEXORA Ultra-Low Latency Feed • 15s Pulse</span>
+                <span className="w-1.5 h-1.5 bg-emerald-500" />
+                <span>NEXORA Ultra-Low Latency Feed</span>
               </div>
             </div>
           </div>

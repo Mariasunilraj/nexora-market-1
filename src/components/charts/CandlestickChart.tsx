@@ -82,19 +82,19 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
   ];
 
   return (
-    <div className="bg-[#0B132B] border border-[#1C2951] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
-      {/* Top Chart Toolbar matching mockup */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#152042]">
-        {/* Timeframe Selector Pills */}
-        <div className="flex items-center gap-1 bg-[#111C3A] p-1 rounded-xl border border-[#1C2951]">
+    <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between shadow-none relative overflow-hidden font-sans">
+      {/* Top Chart Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-zinc-800">
+        {/* Timeframe Selector */}
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-zinc-900 p-0.5 border border-slate-200 dark:border-zinc-800">
           {timeframes.map((tf) => (
             <button
               key={tf}
               onClick={() => onTimeframeChange(tf)}
-              className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+              className={`px-2 py-1 text-xs font-semibold uppercase tracking-wider transition-colors border ${
                 activeTimeframe === tf
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-blue-600 dark:bg-[#3B82F6] text-white border-blue-600 dark:border-[#3B82F6]'
+                  : 'border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {tf}
@@ -103,36 +103,36 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
         </div>
 
         {/* Right Tools: Indicators, Chart Style, Fullscreen */}
-        <div className="flex items-center gap-1.5 text-slate-400">
+        <div className="flex items-center gap-1 text-slate-400 dark:text-zinc-400">
           <button
             onClick={() => setChartType(chartType === 'candles' ? 'line' : 'candles')}
             title="Toggle Candle / Line Chart"
-            className="p-1.5 rounded-lg hover:text-white hover:bg-[#111C3A] transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
           >
             <BarChart2 className="w-4 h-4" />
           </button>
           <button
             title="Technical Indicators"
-            className="p-1.5 rounded-lg hover:text-white hover:bg-[#111C3A] transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
           >
             <Activity className="w-4 h-4" />
           </button>
           <button
             title="Chart Settings"
-            className="p-1.5 rounded-lg hover:text-white hover:bg-[#111C3A] transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
           >
             <Sliders className="w-4 h-4" />
           </button>
           <button
             onClick={() => alert('Chart snapshot saved to clipboard')}
             title="Take Snapshot"
-            className="p-1.5 rounded-lg hover:text-white hover:bg-[#111C3A] transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
           >
             <Camera className="w-4 h-4" />
           </button>
           <button
             title="Fullscreen Chart"
-            className="p-1.5 rounded-lg hover:text-white hover:bg-[#111C3A] transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
           >
             <Maximize2 className="w-4 h-4" />
           </button>
@@ -142,7 +142,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
       {/* Chart Canvas & Left Drawing Toolbar Area */}
       <div className="flex gap-2 pt-3 relative">
         {/* Left Drawing Tools Sidebar */}
-        <div className="hidden sm:flex flex-col gap-2 py-2 pr-2 border-r border-[#152042] text-slate-400 text-xs">
+        <div className="hidden sm:flex flex-col gap-1.5 py-1 pr-2 border-r border-slate-100 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 text-xs">
           {[
             { id: 'crosshair', icon: Compass, label: 'Crosshair' },
             { id: 'trendline', icon: TrendingUp, label: 'Trend Line' },
@@ -157,10 +157,10 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
                 key={tool.id}
                 onClick={() => setSelectedTool(tool.id)}
                 title={tool.label}
-                className={`p-1.5 rounded-lg transition-colors ${
+                className={`p-1.5 transition-colors border ${
                   selectedTool === tool.id
-                    ? 'text-blue-400 bg-blue-500/15'
-                    : 'hover:text-white hover:bg-[#111C3A]'
+                    ? 'text-blue-600 dark:text-[#3B82F6] bg-blue-500/10 border-blue-500/20'
+                    : 'border-transparent hover:text-slate-900 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -171,24 +171,24 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
         {/* Main Interactive Chart Canvas */}
         <div className="flex-1 relative">
-          {/* Live OHLC Header Banner matching mockup */}
+          {/* Live OHLC Header Banner */}
           <div className="flex flex-wrap items-center gap-3 text-xs mb-2 font-mono">
-            <span className="font-bold text-white tracking-wide">
+            <span className="font-bold text-slate-900 dark:text-white tracking-wide">
               {symbol} • {activeTimeframe} • {exchange}
             </span>
-            <span className="text-slate-400">
-              O <span className={activeCandle.open >= activeCandle.close ? 'text-rose-400' : 'text-emerald-400 font-bold'}>{activeCandle.open.toFixed(2)}</span>
+            <span className="text-slate-500 dark:text-zinc-400">
+              O <span className={activeCandle.open >= activeCandle.close ? 'text-rose-500' : 'text-emerald-500 font-bold'}>{activeCandle.open.toFixed(2)}</span>
             </span>
-            <span className="text-slate-400">
-              H <span className="text-slate-200 font-bold">{activeCandle.high.toFixed(2)}</span>
+            <span className="text-slate-500 dark:text-zinc-400">
+              H <span className="text-slate-800 dark:text-zinc-200 font-bold">{activeCandle.high.toFixed(2)}</span>
             </span>
-            <span className="text-slate-400">
-              L <span className="text-slate-200 font-bold">{activeCandle.low.toFixed(2)}</span>
+            <span className="text-slate-500 dark:text-zinc-400">
+              L <span className="text-slate-800 dark:text-zinc-200 font-bold">{activeCandle.low.toFixed(2)}</span>
             </span>
-            <span className="text-slate-400">
-              C <span className={isUp ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>{activeCandle.close.toFixed(2)}</span>
+            <span className="text-slate-500 dark:text-zinc-400">
+              C <span className={isUp ? 'text-emerald-500 font-bold' : 'text-rose-500 font-bold'}>{activeCandle.close.toFixed(2)}</span>
             </span>
-            <span className={`font-bold ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <span className={`font-bold ${isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
               {isUp ? '+' : ''}{priceChange.toFixed(2)} ({isUp ? '+' : ''}{priceChangePercent.toFixed(2)}%)
             </span>
           </div>
@@ -208,13 +208,13 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
                   y1={getY(p)}
                   x2={width - 70}
                   y2={getY(p)}
-                  stroke="#16244C"
-                  strokeDasharray="3 3"
+                  stroke="#27272A"
+                  strokeDasharray="2 2"
                   strokeWidth="1"
                 />
               ))}
 
-              {/* Volume Bars (Histogram) */}
+              {/* Volume Bars */}
               {displayedCandles.map((candle, idx) => {
                 const x = idx * ((width - 75) / displayedCandles.length) + 10;
                 const y = getVolY(candle.volume);
@@ -270,7 +270,6 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
                       width={candleWidth}
                       height={bodyHeight}
                       fill={color}
-                      rx="1"
                     />
                   </g>
                 );
@@ -286,7 +285,7 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
                   }, '')}
                   fill="none"
                   stroke="#3B82F6"
-                  strokeWidth="2.5"
+                  strokeWidth="2"
                 />
               )}
 
@@ -302,11 +301,11 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
               />
             </svg>
 
-            {/* Right Price Scale matching mockup */}
-            <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-[#152042] flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-slate-400">
+            {/* Right Price Scale */}
+            <div className="absolute top-0 right-0 bottom-6 w-16 border-l border-slate-100 dark:border-zinc-800 flex flex-col justify-between py-2 pl-2 text-[10px] font-mono text-slate-400 dark:text-zinc-500">
               <span>{maxPrice.toFixed(2)}</span>
               <span>{(maxPrice * 0.98).toFixed(2)}</span>
-              <span className="bg-emerald-500 text-slate-950 px-1 py-0.5 rounded font-bold text-[11px] shadow-md shadow-emerald-500/20">
+              <span className="bg-emerald-600 text-white px-1 py-0.5 font-bold text-[10px]">
                 {currentPrice.toFixed(2)}
               </span>
               <span>{(minPrice * 1.05).toFixed(2)}</span>
@@ -314,8 +313,8 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
             </div>
           </div>
 
-          {/* Bottom Timeline & Status Row matching mockup */}
-          <div className="flex items-center justify-between pt-2 border-t border-[#152042] text-[11px] text-slate-400 font-mono">
+          {/* Bottom Timeline & Status Row */}
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800 text-[11px] text-slate-400 dark:text-zinc-500 font-mono">
             <div className="flex gap-6 overflow-hidden">
               <span>Dec</span>
               <span>2025</span>
@@ -327,9 +326,9 @@ export const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
             <div className="flex items-center gap-2">
               <span>10:45:23 (UTC-4)</span>
-              <span className="text-slate-500">%</span>
-              <span className="text-slate-500">log</span>
-              <span className="text-blue-400 font-bold">auto</span>
+              <span className="text-slate-400 dark:text-zinc-600">%</span>
+              <span className="text-slate-400 dark:text-zinc-600">log</span>
+              <span className="text-blue-600 dark:text-[#3B82F6] font-bold">auto</span>
             </div>
           </div>
         </div>

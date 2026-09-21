@@ -3,29 +3,49 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-nexora-dark: #0B132B;
-  --color-nexora-darker: #070D1F;
-  --color-nexora-card: #111C3A;
-  --color-nexora-border: #1C2951;
-  --color-nexora-accent: #2563EB;
-  --color-nexora-accent-hover: #1D4ED8;
-  --color-nexora-teal: #00F2FE;
+  --color-charcoal-default: #18181B;
+  --color-charcoal-card: #27272A;
+  --color-charcoal-border: #3F3F46;
+  --color-electric-blue: #3B82F6;
+  --color-light-blue: #2563EB;
+  --color-pure-white: #FFFFFF;
+  --color-nexora-dark: #18181B;
+  --color-nexora-darker: #09090B;
+  --color-nexora-card: #27272A;
+  --color-nexora-border: #3F3F46;
+  --color-nexora-accent: #3B82F6;
+  --color-nexora-accent-hover: #2563EB;
   --color-nexora-green: #10B981;
   --color-nexora-red: #EF4444;
-  --color-nexora-purple: #8B5CF6;
+}
+
+/* 1. STRICT ZERO-RADIUS SHARP GEOMETRY (NO BENDS / NO ROUNDED CORNERS) */
+*, *::before, *::after {
+  border-radius: 0 !important;
 }
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    @apply transition-colors duration-150;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply transition-colors duration-150 bg-white text-zinc-900;
+  }
+
+  .dark body, body.dark {
+    @apply bg-[#18181B] text-zinc-100;
+  }
+
+  /* Monospace numbers for financial precision */
+  .font-mono, [data-tabular-num] {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Custom scrollbar styling */
+/* 2. MODERN MINIMALIST FINTECH SCROLLBAR */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -33,18 +53,40 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
-  border-radius: 4px;
+  background: rgba(161, 161, 170, 0.4);
+  border-radius: 0 !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
+  background: rgba(161, 161, 170, 0.7);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.5);
+  background: rgba(63, 63, 70, 0.7);
+  border-radius: 0 !important;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(71, 85, 105, 0.8);
+  background: rgba(113, 113, 122, 0.9);
+}
+
+/* 3. MINIMALIST FINTECH CARD & BORDER UTILITIES */
+.fintech-card {
+  @apply bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 transition-colors duration-150;
+}
+
+.fintech-card-hover {
+  @apply bg-white dark:bg-[#18181B] border border-zinc-200 dark:border-zinc-800 hover:border-blue-600 dark:hover:border-blue-500 transition-colors duration-150;
+}
+
+.fintech-input {
+  @apply bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-0 transition-colors duration-150;
+}
+
+.fintech-btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-150;
+}
+
+.fintech-btn-secondary {
+  @apply bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-semibold transition-colors duration-150;
 }

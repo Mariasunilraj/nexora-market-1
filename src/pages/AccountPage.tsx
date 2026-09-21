@@ -330,7 +330,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
 
   // Password strength calculation
   const getPasswordStrength = (pass: string) => {
-    if (!pass) return { score: 0, label: 'None', color: 'bg-slate-200 dark:bg-slate-700' };
+    if (!pass) return { score: 0, label: 'None', color: 'bg-slate-200 dark:bg-zinc-700 text-slate-400' };
     let score = 0;
     if (pass.length >= 6) score += 1;
     if (pass.length >= 10) score += 1;
@@ -343,7 +343,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       case 2:
         return { score: 50, label: 'Medium', color: 'bg-amber-500 text-amber-500' };
       case 3:
-        return { score: 75, label: 'Strong', color: 'bg-blue-500 text-blue-500' };
+        return { score: 75, label: 'Strong', color: 'bg-blue-500 dark:bg-[#3B82F6] text-blue-500 dark:text-[#3B82F6]' };
       case 4:
         return { score: 100, label: 'Institutional Grade', color: 'bg-emerald-500 text-emerald-500' };
       default:
@@ -356,16 +356,16 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Top Tabs */}
-      <div className="border-b border-slate-200/80 dark:border-slate-800">
-        <div className="flex space-x-8">
+      <div className="border-b border-slate-200 dark:border-zinc-800">
+        <div className="flex space-x-6">
           {(['Profile', 'Plan & Billing', 'Security'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-3 px-1 border-b-2 font-bold text-sm transition-all flex items-center gap-2 ${
+              className={`py-3 px-1 border-b-2 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 ${
                 activeTab === tab
-                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  ? 'border-blue-600 dark:border-[#3B82F6] text-blue-600 dark:text-[#3B82F6]'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
               {tab === 'Profile' && <User className="w-4 h-4" />}
@@ -378,8 +378,8 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       </div>
 
       {actionNotice && (
-        <div className="p-4 rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3 text-sm font-semibold animate-in fade-in">
-          <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-500" />
+        <div className="p-4 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-3 text-xs font-semibold animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-500" />
           <span>{actionNotice}</span>
         </div>
       )}
@@ -400,17 +400,17 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         <div className="space-y-6 animate-in fade-in duration-200">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Profile Information & Avatar Card */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col items-start justify-between">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col items-start justify-between">
               <div className="w-full">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-5 flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-5 flex items-center justify-between">
                   <span>Profile Information</span>
-                  <span className="text-[11px] font-semibold text-slate-400">Account ID: #NX-{userProfile.name?.substring(0, 3).toUpperCase() || 'USR'}</span>
+                  <span className="text-[11px] font-mono font-normal text-slate-400 dark:text-zinc-500">ID: NX-{userProfile.name?.substring(0, 3).toUpperCase() || 'USR'}</span>
                 </h4>
 
                 <div className="flex flex-col items-start space-y-4">
                   {/* Avatar with Upload & Overlay Badge */}
                   <div className="relative group">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-tr from-blue-600 to-indigo-600 border-2 border-blue-500/40 shadow-xl shadow-blue-500/20 flex items-center justify-center text-white font-black text-3xl transition-transform group-hover:scale-105">
+                    <div className="w-20 h-20 overflow-hidden bg-blue-600 dark:bg-[#3B82F6] border border-slate-200 dark:border-zinc-700 flex items-center justify-center text-white font-bold text-3xl">
                       {userProfile.avatarUrl ? (
                         <img
                           src={userProfile.avatarUrl}
@@ -429,7 +429,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       title="Upload custom photo"
-                      className="absolute -bottom-1.5 -right-1.5 p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg border-2 border-white dark:border-[#0E172E] transition-transform hover:scale-110"
+                      className="absolute -bottom-1 -right-1 p-1.5 bg-blue-600 dark:bg-[#3B82F6] text-white border border-white dark:border-[#18181B] hover:opacity-90 transition-opacity"
                     >
                       <Camera className="w-3.5 h-3.5" />
                     </button>
@@ -439,10 +439,10 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   <div className="flex flex-wrap gap-2 pt-1 w-full">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-[#111C3A] text-slate-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/40 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-700/80 transition-colors flex items-center justify-center gap-1.5"
+                      className="flex-1 py-1.5 px-2.5 text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider"
                     >
                       <Upload className="w-3.5 h-3.5" />
-                      <span>Upload Photo</span>
+                      <span>Upload</span>
                     </button>
 
                     <button
@@ -450,17 +450,17 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                         setTempSelectedAvatar(userProfile.avatarUrl || null);
                         setIsAvatarPickerModalOpen(true);
                       }}
-                      className="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-800/80 transition-colors flex items-center justify-center gap-1.5"
+                      className="flex-1 py-1.5 px-2.5 text-xs font-semibold bg-blue-50 dark:bg-zinc-800 text-blue-600 dark:text-[#3B82F6] hover:bg-blue-100 dark:hover:bg-zinc-700 border border-blue-200 dark:border-zinc-700 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>Stock Avatars</span>
+                      <span>Avatars</span>
                     </button>
 
                     {userProfile.avatarUrl && (
                       <button
                         onClick={handleRemovePhoto}
                         title="Remove photo"
-                        className="py-1.5 px-2 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200/60 dark:border-rose-800/60 transition-colors"
+                        className="py-1.5 px-2 text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -468,19 +468,19 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
                       {userProfile.name}
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-zinc-400">
                       {userProfile.email}
                     </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                    <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1">
                       Member since {userProfile.memberSince}
                     </p>
                   </div>
 
                   <div>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 border border-purple-200 dark:border-purple-800/80">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-[#3B82F6] border border-blue-500/20">
                       <Sparkles className="w-3 h-3 fill-current" />
                       {currentPlanName}
                     </span>
@@ -490,42 +490,42 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
 
               <button
                 onClick={() => setIsEditProfileModalOpen(true)}
-                className="w-full mt-6 py-2.5 px-4 text-xs font-bold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+                className="w-full mt-6 py-2 px-4 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-[#3B82F6] border border-blue-600 dark:border-[#3B82F6] hover:bg-blue-50 dark:hover:bg-[#3B82F6]/10 transition-colors"
               >
                 Edit Profile Information
               </button>
             </div>
 
             {/* Account Summary */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between">
               <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-5">
                   Account Summary
                 </h4>
 
-                <div className="space-y-4 text-sm font-medium">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
-                    <span className="text-slate-500 dark:text-slate-400">Account Type</span>
+                <div className="space-y-4 text-xs font-medium">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+                    <span className="text-slate-500 dark:text-zinc-400">Account Type</span>
                     <span className="text-slate-900 dark:text-white font-bold">Paper Trading</span>
                   </div>
 
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
-                    <span className="text-slate-500 dark:text-slate-400">Virtual Equity</span>
-                    <span className="text-slate-900 dark:text-white font-bold">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+                    <span className="text-slate-500 dark:text-zinc-400">Virtual Equity</span>
+                    <span className="text-slate-900 dark:text-white font-mono font-bold">
                       {formatCurrency(totalPortfolioValue)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
-                    <span className="text-slate-500 dark:text-slate-400">Buying Power</span>
-                    <span className="text-slate-900 dark:text-white font-bold">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+                    <span className="text-slate-500 dark:text-zinc-400">Buying Power</span>
+                    <span className="text-slate-900 dark:text-white font-mono font-bold">
                       {formatCurrency(buyingPower)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-500 dark:text-slate-400">Total P&L</span>
-                    <span className={`font-bold ${totalPnL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    <span className="text-slate-500 dark:text-zinc-400">Total P&L</span>
+                    <span className={`font-mono font-bold ${totalPnL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                       {formatCurrency(totalPnL, true)} ({formatPercent(totalPnLPercent)})
                     </span>
                   </div>
@@ -534,39 +534,39 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">
                 Quick Actions
               </h4>
 
-              <div className="space-y-1 font-medium text-sm">
+              <div className="space-y-1 font-medium text-xs">
                 <button
                   onClick={() => setIsResetModalOpen(true)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-[#3B82F6] transition-colors text-left border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
                 >
-                  <RotateCcw className="w-4 h-4 text-blue-500" />
+                  <RotateCcw className="w-4 h-4 text-blue-500 dark:text-[#3B82F6]" />
                   <span>Reset Paper Account</span>
                 </button>
 
                 <button
                   onClick={handleDownloadStatement}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-[#3B82F6] transition-colors text-left border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
                 >
-                  <Download className="w-4 h-4 text-blue-500" />
+                  <Download className="w-4 h-4 text-blue-500 dark:text-[#3B82F6]" />
                   <span>Download Statement</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('Plan & Billing')}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-[#3B82F6] transition-colors text-left border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
                 >
-                  <Sparkles className="w-4 h-4 text-purple-500" />
+                  <Sparkles className="w-4 h-4 text-blue-500 dark:text-[#3B82F6]" />
                   <span>Upgrade Subscription Plan</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('Security')}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-[#3B82F6] transition-colors text-left border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
                 >
                   <KeyRound className="w-4 h-4 text-emerald-500" />
                   <span>Security & 2FA Setup</span>
@@ -574,7 +574,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
 
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left border border-transparent hover:border-rose-200 dark:hover:border-rose-800/50"
                 >
                   <LogOut className="w-4 h-4 text-rose-500" />
                   <span>Logout</span>
@@ -584,15 +584,15 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           </div>
 
           {/* Virtual Cash Balance Card */}
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                 Virtual Cash Balance
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                 Available Cash for Trading:
               </p>
-              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+              <p className="text-2xl font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                 ${buyingPower.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -600,13 +600,13 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => setIsDepositModalOpen(true)}
-                className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-500/20 transition-all"
+                className="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
               >
                 Deposit (Virtual)
               </button>
               <button
                 onClick={() => setIsWithdrawModalOpen(true)}
-                className="flex-1 sm:flex-none px-6 py-2.5 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-bold text-sm rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+                className="flex-1 sm:flex-none px-5 py-2.5 text-blue-600 dark:text-[#3B82F6] border border-blue-600 dark:border-[#3B82F6] font-semibold text-xs uppercase tracking-wider hover:bg-blue-50 dark:hover:bg-[#3B82F6]/10 transition-colors"
               >
                 Withdraw (Virtual)
               </button>
@@ -621,22 +621,22 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       {activeTab === 'Plan & Billing' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Active Plan Overview */}
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-600/10 border border-purple-500/30 flex items-center justify-center text-purple-500 flex-shrink-0">
-                <Sparkles className="w-6 h-6" />
+              <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-[#3B82F6] flex-shrink-0">
+                <Sparkles className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
                     {currentPlanName}
                   </h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     Active
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Renews on <strong className="text-slate-800 dark:text-slate-200">August 31, 2026</strong> • Virtual Institutional Simulation
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                  Renews on <strong className="text-slate-800 dark:text-zinc-200 font-medium">August 31, 2026</strong> • Virtual Institutional Simulation
                 </p>
               </div>
             </div>
@@ -644,7 +644,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsUpgradeModalOpen(true)}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/20 transition-all"
+                className="px-4 py-2 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
               >
                 Change or Upgrade Plan
               </button>
@@ -653,22 +653,22 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
 
           {/* Billing Cycle Switcher */}
           <div className="flex items-center justify-center gap-3 my-4">
-            <span className={`text-xs font-bold ${billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wider ${billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`}>
               Monthly Billing
             </span>
             <button
               onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'yearly' : 'monthly')}
-              className="w-12 h-6 bg-slate-200 dark:bg-slate-700 rounded-full p-1 transition-colors relative flex items-center"
+              className="w-12 h-6 bg-slate-200 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 p-0.5 transition-colors relative flex items-center"
             >
               <div
-                className={`w-4 h-4 rounded-full bg-blue-600 transition-transform ${
+                className={`w-4 h-4 bg-blue-600 dark:bg-[#3B82F6] transition-transform ${
                   billingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-0'
                 }`}
               />
             </button>
-            <span className={`text-xs font-bold flex items-center gap-1.5 ${billingCycle === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${billingCycle === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`}>
               <span>Annual Billing</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-extrabold border border-emerald-500/30">
+              <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
                 SAVE 20%
               </span>
             </span>
@@ -677,15 +677,15 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           {/* 3 Tier Pricing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Free Starter Plan */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between">
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">Free Starter</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Essential paper trading tools</p>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">Free Starter</h4>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">Essential paper trading tools</p>
                 <div className="my-4">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">$0</span>
+                  <span className="text-3xl font-mono font-bold text-slate-900 dark:text-white">$0</span>
                   <span className="text-xs text-slate-400 font-medium"> / forever</span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-zinc-300 font-medium border-t border-slate-100 dark:border-zinc-800 pt-4">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500" />
                     <span>$25,000 Virtual Starting Cash</span>
@@ -713,30 +713,30 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   setActionNotice('Switched to Free Starter plan.');
                 }}
                 disabled={currentPlanName === 'Free Starter'}
-                className="w-full mt-6 py-2.5 border border-slate-200 dark:border-slate-700 text-xs font-bold rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+                className="w-full mt-6 py-2.5 border border-slate-200 dark:border-zinc-700 text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-50"
               >
                 {currentPlanName === 'Free Starter' ? 'Current Plan' : 'Downgrade to Free'}
               </button>
             </div>
 
             {/* Paper Trading Pro */}
-            <div className="bg-white dark:bg-[#0E172E] border-2 border-blue-500 dark:border-blue-500 rounded-2xl p-6 shadow-xl relative flex flex-col justify-between">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-md">
+            <div className="bg-white dark:bg-[#18181B] border-2 border-blue-600 dark:border-[#3B82F6] p-6 relative flex flex-col justify-between">
+              <span className="absolute -top-3 left-4 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-blue-600 dark:bg-[#3B82F6] text-white">
                 Most Popular
               </span>
 
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">Paper Trading Pro</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time charts & full indicators</p>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">Paper Trading Pro</h4>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">Real-time charts & full indicators</p>
                 <div className="my-4">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">
+                  <span className="text-3xl font-mono font-bold text-slate-900 dark:text-white">
                     {billingCycle === 'monthly' ? '$29' : '$279'}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">
                     {billingCycle === 'monthly' ? ' / month' : ' / year'}
                   </span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-zinc-300 font-medium border-t border-slate-100 dark:border-zinc-800 pt-4">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500" />
                     <span>$100,000 Virtual Starting Cash</span>
@@ -768,26 +768,26 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   setActionNotice('Activated Paper Trading Pro plan.');
                 }}
                 disabled={currentPlanName === 'Paper Trading Pro'}
-                className="w-full mt-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/30 disabled:opacity-50"
+                className="w-full mt-6 py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider disabled:opacity-50"
               >
                 {currentPlanName === 'Paper Trading Pro' ? 'Current Plan' : 'Select Pro Plan'}
               </button>
             </div>
 
             {/* Institutional Elite */}
-            <div className="bg-white dark:bg-[#0E172E] border border-purple-200 dark:border-purple-800/60 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between">
               <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">Institutional Elite</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Algorithmic & Level 2 execution</p>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">Institutional Elite</h4>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">Algorithmic & Level 2 execution</p>
                 <div className="my-4">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">
+                  <span className="text-3xl font-mono font-bold text-slate-900 dark:text-white">
                     {billingCycle === 'monthly' ? '$79' : '$759'}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">
                     {billingCycle === 'monthly' ? ' / month' : ' / year'}
                   </span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                <ul className="space-y-2.5 text-xs text-slate-600 dark:text-zinc-300 font-medium border-t border-slate-100 dark:border-zinc-800 pt-4">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500" />
                     <span>Unlimited Virtual Simulation Cash</span>
@@ -817,7 +817,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   setIsUpgradeModalOpen(true);
                 }}
                 disabled={currentPlanName === 'Institutional Elite'}
-                className="w-full mt-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 disabled:opacity-50"
+                className="w-full mt-6 py-2.5 bg-slate-900 dark:bg-zinc-800 text-white font-semibold text-xs uppercase tracking-wider hover:bg-slate-800 dark:hover:bg-zinc-700 disabled:opacity-50 border border-slate-700 dark:border-zinc-700"
               >
                 {currentPlanName === 'Institutional Elite' ? 'Current Plan' : 'Upgrade to Elite'}
               </button>
@@ -827,25 +827,25 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           {/* Payment Method & Invoices Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Payment Method */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-blue-500" />
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-blue-600 dark:text-[#3B82F6]" />
                 Payment Method
               </h4>
 
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
+              <div className="p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-7 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+                  <div className="w-10 h-7 bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] uppercase">
                     VISA
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-900 dark:text-white">Visa ending in 4242</p>
-                    <p className="text-[10px] text-slate-400">Expires 12/28 • Default</p>
+                    <p className="text-[10px] text-slate-400 dark:text-zinc-500">Expires 12/28 • Default</p>
                   </div>
                 </div>
                 <button
                   onClick={() => alert('Payment method updated!')}
-                  className="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+                  className="text-xs text-blue-600 dark:text-[#3B82F6] font-semibold uppercase tracking-wider hover:underline"
                 >
                   Edit
                 </button>
@@ -853,8 +853,8 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
             </div>
 
             {/* Billing Invoices */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                 <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
                 Recent Invoices
               </h4>
@@ -864,14 +864,14 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   { id: 'INV-2025-0814', date: 'Aug 14, 2025', amt: '$29.00', status: 'Paid' },
                   { id: 'INV-2025-0714', date: 'Jul 14, 2025', amt: '$29.00', status: 'Paid' },
                 ].map((inv) => (
-                  <div key={inv.id} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/60 last:border-none">
+                  <div key={inv.id} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-zinc-800/60 last:border-none">
                     <div>
-                      <p className="font-bold text-slate-800 dark:text-slate-200">{inv.id}</p>
-                      <p className="text-[10px] text-slate-400">{inv.date}</p>
+                      <p className="font-mono font-bold text-slate-800 dark:text-zinc-200">{inv.id}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-zinc-500">{inv.date}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="font-mono font-bold text-slate-900 dark:text-white">{inv.amt}</span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                         {inv.status}
                       </span>
                     </div>
@@ -889,28 +889,28 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       {activeTab === 'Security' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Two-Factor Authentication (2FA) */}
-          <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5">
-                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                <div className={`w-10 h-10 flex items-center justify-center flex-shrink-0 ${
                   is2FAEnabled ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' : 'bg-amber-500/10 text-amber-500 border border-amber-500/30'
                 }`}>
-                  <ShieldCheck className="w-6 h-6" />
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white">
                       Two-Factor Authentication (2FA)
                     </h4>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    <span className={`px-2 py-0.2 text-[10px] font-bold uppercase tracking-wider ${
                       is2FAEnabled
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
-                        : 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                     }`}>
                       {is2FAEnabled ? 'Protected' : 'Recommended'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                     Add an additional layer of biometric or authenticator app protection when signing in to your trading station.
                   </p>
                 </div>
@@ -925,10 +925,10 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     setIs2FAModalOpen(true);
                   }
                 }}
-                className={`px-5 py-2.5 font-bold text-xs rounded-xl transition-all ${
+                className={`px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all ${
                   is2FAEnabled
-                    ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white'
                 }`}
               >
                 {is2FAEnabled ? 'Disable 2FA' : 'Enable 2FA Protection'}
@@ -939,21 +939,21 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           {/* Change Password & Security Level */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Change Password Form */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Lock className="w-4 h-4 text-blue-500" />
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                <Lock className="w-4 h-4 text-blue-600 dark:text-[#3B82F6]" />
                 Change Password
               </h4>
 
               {passwordNotice && (
-                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-800">
+                <div className="p-3 bg-blue-500/10 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-500/20">
                   {passwordNotice}
                 </div>
               )}
 
               <form onSubmit={handleUpdatePassword} className="space-y-3.5 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
                     Current Password
                   </label>
                   <input
@@ -962,12 +962,12 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     placeholder="Enter current password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-3.5 py-2 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
                     New Password
                   </label>
                   <div className="relative flex items-center">
@@ -977,7 +977,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                       placeholder="Create a strong password"
                       value={newSecurityPassword}
                       onChange={(e) => setNewSecurityPassword(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-3.5 py-2 pr-10 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                     />
                     <button
                       type="button"
@@ -991,13 +991,13 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   {/* Strength Bar */}
                   {newSecurityPassword && (
                     <div className="mt-2 space-y-1">
-                      <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-1 w-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
                         <div
                           className={`h-full ${strength.color} transition-all`}
                           style={{ width: `${strength.score}%` }}
                         />
                       </div>
-                      <span className={`text-[10px] font-bold ${strength.color}`}>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${strength.color}`}>
                         Strength: {strength.label}
                       </span>
                     </div>
@@ -1005,7 +1005,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
                     Confirm New Password
                   </label>
                   <input
@@ -1014,13 +1014,13 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     placeholder="Re-enter new password"
                     value={confirmSecurityPassword}
                     onChange={(e) => setConfirmSecurityPassword(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-3.5 py-2 text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition-all mt-2"
+                  className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors mt-2"
                 >
                   Update & Encrypt Password
                 </button>
@@ -1028,9 +1028,9 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
             </div>
 
             {/* Active Sessions & Devices */}
-            <div className="bg-white dark:bg-[#0E172E] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#18181B] border border-slate-200 dark:border-zinc-800 p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                   <Laptop className="w-4 h-4 text-emerald-500" />
                   Active Device Sessions
                 </h4>
@@ -1039,9 +1039,9 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     setActiveSessions(prev => prev.filter(s => s.isCurrent));
                     setActionNotice('Logged out of all other remote devices.');
                   }}
-                  className="text-[11px] font-semibold text-rose-500 hover:underline"
+                  className="text-[11px] font-semibold uppercase tracking-wider text-rose-500 hover:underline"
                 >
-                  Log Out Other Devices
+                  Log Out Others
                 </button>
               </div>
 
@@ -1049,22 +1049,22 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                 {activeSessions.map((session) => (
                   <div
                     key={session.id}
-                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700/60 flex items-center justify-between"
+                    className="p-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-blue-600/10 text-blue-500 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-blue-500/10 text-blue-600 dark:text-[#3B82F6] flex items-center justify-center">
                         {session.type === 'desktop' ? <Laptop className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-xs font-bold text-slate-900 dark:text-white">{session.device}</p>
                           {session.isCurrent && (
-                            <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+                            <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                               You
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-[10px] font-mono text-slate-500 dark:text-zinc-400 mt-0.5">
                           {session.ip} • {session.location} • {session.status}
                         </p>
                       </div>
@@ -1073,7 +1073,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                     {!session.isCurrent && (
                       <button
                         onClick={() => handleRevokeSession(session.id)}
-                        className="text-[11px] font-semibold text-rose-500 hover:underline"
+                        className="text-[11px] font-semibold uppercase tracking-wider text-rose-500 hover:underline"
                       >
                         Revoke
                       </button>
@@ -1082,7 +1082,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                 ))}
               </div>
 
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
                 <span>Database Encryption: SHA-256 Salted</span>
                 <span className="text-emerald-500 font-bold flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
@@ -1105,12 +1105,12 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title="Choose Stock Market Trader Avatar"
       >
         <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400">
             Select a specialized stock market persona for your trading workstation:
           </p>
 
           {/* Gender Filter Tabs */}
-          <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-100 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700/60">
+          <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
             {[
               { key: 'all', label: 'All Avatars (8)' },
               { key: 'male', label: 'Men Traders (4)' },
@@ -1119,10 +1119,10 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
               <button
                 key={tab.key}
                 onClick={() => setAvatarGenderFilter(tab.key as any)}
-                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
                   avatarGenderFilter === tab.key
-                    ? 'bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-[#3B82F6] border border-slate-200 dark:border-zinc-700'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {tab.label}
@@ -1138,20 +1138,20 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                 <div
                   key={avatar.id}
                   onClick={() => setTempSelectedAvatar(avatar.avatarSvg)}
-                  className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center text-center relative ${
+                  className={`p-3 border transition-all cursor-pointer flex flex-col items-center text-center relative ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/40 shadow-lg shadow-blue-500/20 scale-[1.02]'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#111C3A] hover:border-slate-300 dark:hover:border-slate-700'
+                      ? 'border-blue-600 dark:border-[#3B82F6] bg-blue-50/50 dark:bg-[#3B82F6]/10'
+                      : 'border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700'
                   }`}
                 >
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md">
+                    <div className="absolute top-2 right-2 w-4 h-4 bg-blue-600 dark:bg-[#3B82F6] text-white flex items-center justify-center">
                       <Check className="w-3 h-3" />
                     </div>
                   )}
 
                   {/* Avatar SVG Preview */}
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md my-1">
+                  <div className="w-16 h-16 overflow-hidden my-1 border border-slate-200 dark:border-zinc-700">
                     <img
                       src={avatar.avatarSvg}
                       alt={avatar.name}
@@ -1162,11 +1162,11 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
                   <h5 className="text-xs font-bold text-slate-900 dark:text-white mt-1.5">
                     {avatar.name}
                   </h5>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">
                     {avatar.role}
                   </p>
 
-                  <span className="mt-2 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-white dark:bg-[#0E172E] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <span className="mt-2 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-white dark:bg-[#18181B] text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700">
                     {avatar.badge}
                   </span>
                 </div>
@@ -1177,16 +1177,16 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setIsAvatarPickerModalOpen(false)}
-              className="flex-1 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl"
+              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
             >
               Cancel
             </button>
             <button
               onClick={handleApplyMarketAvatar}
               disabled={!tempSelectedAvatar}
-              className="flex-1 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl shadow-lg shadow-blue-600/30 disabled:opacity-50"
+              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-white bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 disabled:opacity-50"
             >
-              Apply Selected Avatar
+              Apply Avatar
             </button>
           </div>
         </div>
@@ -1199,17 +1199,17 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title="Set Up Two-Factor Authentication"
       >
         <form onSubmit={handleVerify2FA} className="space-y-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400">
             Scan this QR code with your Authenticator app (Google Authenticator, Microsoft Authenticator, or Authy):
           </p>
 
-          <div className="w-40 h-40 mx-auto rounded-2xl bg-white p-3 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-900 shadow-inner">
+          <div className="w-40 h-40 mx-auto bg-white p-3 border border-slate-200 dark:border-zinc-700 flex flex-col items-center justify-center text-slate-900">
             <QrCode className="w-28 h-28" />
             <span className="text-[9px] font-mono font-bold tracking-widest mt-1">NX-8834-A79B</span>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 text-center">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1 text-center">
               Enter 6-Digit Authenticator Code
             </label>
             <input
@@ -1219,13 +1219,13 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
               placeholder="e.g. 123456"
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value.replace(/\D/g, ''))}
-              className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 text-center text-xl font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 py-2.5 text-center text-xl font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-md transition-all"
+            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
           >
             Verify & Activate 2FA
           </button>
@@ -1239,23 +1239,23 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title={`Upgrade to ${selectedUpgradePlan}`}
       >
         <div className="space-y-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400">
             Confirm your subscription change to <strong className="text-slate-900 dark:text-white">{selectedUpgradePlan}</strong>:
           </p>
 
-          <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 space-y-2">
-            <div className="flex justify-between text-xs font-bold text-purple-900 dark:text-purple-300">
+          <div className="p-4 bg-blue-500/10 border border-blue-500/20 space-y-2">
+            <div className="flex justify-between text-xs font-bold text-blue-900 dark:text-blue-300">
               <span>{selectedUpgradePlan} ({billingCycle})</span>
-              <span>{billingCycle === 'monthly' ? '$79/month' : '$759/year'}</span>
+              <span className="font-mono">{billingCycle === 'monthly' ? '$79/month' : '$759/year'}</span>
             </div>
-            <p className="text-[11px] text-purple-700 dark:text-purple-400">
+            <p className="text-[11px] text-blue-700 dark:text-blue-400">
               Includes unlimited simulation funds, institutional DOM Level 2, and dedicated API capacity.
             </p>
           </div>
 
           <button
             onClick={handleConfirmPlanUpgrade}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-sm rounded-xl shadow-lg transition-all"
+            className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
           >
             Confirm & Upgrade Subscription
           </button>
@@ -1269,7 +1269,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title="Deposit Virtual Funds"
       >
         <div className="space-y-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400">
             Select or enter the amount of virtual USD to add to your paper trading balance:
           </p>
           <div className="grid grid-cols-3 gap-2">
@@ -1277,10 +1277,10 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
               <button
                 key={amt}
                 onClick={() => setDepositAmount(amt)}
-                className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                className={`py-2 text-xs font-mono font-bold border transition-all ${
                   depositAmount === amt
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                    ? 'border-emerald-600 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                    : 'border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-300'
                 }`}
               >
                 +${amt.toLocaleString()}
@@ -1289,20 +1289,20 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
               Custom Amount ($)
             </label>
             <input
               type="number"
               value={depositAmount}
               onChange={(e) => setDepositAmount(parseFloat(e.target.value) || 0)}
-              className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-900 dark:text-white"
+              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 font-mono text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <button
             onClick={handleDeposit}
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-md transition-all"
+            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
           >
             Confirm Deposit
           </button>
@@ -1317,7 +1317,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
               Amount to Withdraw ($)
             </label>
             <input
@@ -1325,14 +1325,14 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
               max={buyingPower}
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(parseFloat(e.target.value) || 0)}
-              className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-900 dark:text-white"
+              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 font-mono text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
             />
-            <p className="text-[11px] text-slate-400 mt-1">Available: ${buyingPower.toLocaleString()}</p>
+            <p className="text-[11px] font-mono text-slate-400 dark:text-zinc-500 mt-1">Available: ${buyingPower.toLocaleString()}</p>
           </div>
 
           <button
             onClick={handleWithdraw}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all"
+            className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
           >
             Confirm Withdrawal
           </button>
@@ -1346,7 +1346,7 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title="Reset Paper Trading Account"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 rounded-xl border border-rose-200 dark:border-rose-800">
+          <div className="flex items-center gap-3 p-3 bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
             <AlertTriangle className="w-5 h-5 flex-shrink-0" />
             <p className="text-xs font-semibold">
               Warning: Resetting your account will clear all current holdings, orders, and reset virtual equity to $50,000.
@@ -1356,13 +1356,13 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           <div className="flex gap-3">
             <button
               onClick={() => setIsResetModalOpen(false)}
-              className="flex-1 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl"
+              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
             >
               Cancel
             </button>
             <button
               onClick={handleReset}
-              className="flex-1 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-md"
+              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500"
             >
               Yes, Reset
             </button>
@@ -1378,32 +1378,32 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
       >
         <form onSubmit={handleSaveProfile} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
               Full Name
             </label>
             <input
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white"
+              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1">
               Email Address
             </label>
             <input
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-[#111C3A] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white"
+              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md"
+            className="w-full py-2.5 bg-blue-600 dark:bg-[#3B82F6] hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
           >
             Save Profile
           </button>

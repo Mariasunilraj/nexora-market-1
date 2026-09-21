@@ -36,25 +36,26 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
-      <div className={`relative bg-white dark:bg-[#0E172E] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full ${maxWidth} z-10 overflow-hidden transform transition-all`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800/80">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+      <div className={`relative bg-white dark:bg-[#18181B] border border-zinc-300 dark:border-zinc-700 shadow-2xl w-full ${maxWidth} z-10 overflow-hidden transform transition-all`}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#121214]">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white">
             {title}
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Close"
+            className="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-5 sm:p-6">
           {children}
         </div>
       </div>
