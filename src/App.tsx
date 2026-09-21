@@ -64,8 +64,8 @@ export function AppContent() {
             plan: 'Paper Trading Pro',
           },
           data: {
-            cash: cloudData?.cash ?? 50000,
-            buyingPower: cloudData?.buyingPower ?? 50000,
+            cash: cloudData?.cash ?? 10000,
+            buyingPower: cloudData?.buyingPower ?? 10000,
             holdings: cloudData?.holdings || [],
             orders: cloudData?.orders || [],
             transactions: cloudData?.transactions || [],
@@ -124,8 +124,8 @@ export function AppContent() {
             plan: 'Paper Trading Pro',
           },
           data: {
-            cash: cloudData?.cash ?? 50000,
-            buyingPower: cloudData?.buyingPower ?? 50000,
+            cash: cloudData?.cash ?? 10000,
+            buyingPower: cloudData?.buyingPower ?? 10000,
             holdings: cloudData?.holdings || [],
             orders: cloudData?.orders || [],
             transactions: cloudData?.transactions || [],

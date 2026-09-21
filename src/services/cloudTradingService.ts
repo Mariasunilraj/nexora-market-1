@@ -31,7 +31,7 @@ export class CloudTradingService {
         console.warn('Cloud profile fetch warning:', profileErr);
       }
 
-      const virtualCash = profileRow?.virtual_cash !== undefined ? Number(profileRow.virtual_cash) : 50000;
+      const virtualCash = profileRow?.virtual_cash !== undefined ? Number(profileRow.virtual_cash) : 10000;
       const buyingPower = profileRow?.buying_power !== undefined ? Number(profileRow.buying_power) : virtualCash;
 
       const profile: UserProfile = {
@@ -265,7 +265,7 @@ export class CloudTradingService {
   /**
    * Reset user account in Supabase Cloud
    */
-  async resetCloudAccount(userId: string, initialBalance: number = 50000) {
+  async resetCloudAccount(userId: string, initialBalance: number = 10000) {
     if (!supabase) return;
 
     try {

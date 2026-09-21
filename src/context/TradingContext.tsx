@@ -109,7 +109,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [orders, setOrders] = useState<Order[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [indices] = useState<MarketIndex[]>(INITIAL_MARKET_INDICES);
-  const [virtualCash, setVirtualCash] = useState<number>(50000);
+  const [virtualCash, setVirtualCash] = useState<number>(10000);
   const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_PROFILE);
   const [settings, setSettings] = useState<UserSettings>(INITIAL_SETTINGS);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -121,7 +121,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const loadUserSession = useCallback((user: UserAccount) => {
     if (!user) return;
     setUserProfile(user.profile);
-    setVirtualCash(typeof user.data.cash === 'number' ? user.data.cash : 50000);
+    setVirtualCash(typeof user.data.cash === 'number' ? user.data.cash : 10000);
     setHoldings(user.data.holdings || []);
     setOrders(user.data.orders || []);
     setTransactions(user.data.transactions || []);
@@ -587,7 +587,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [virtualCash, buyingPower]);
 
   // Reset Paper Trading Account
-  const resetAccount = useCallback((initialBalance: number = 50000) => {
+  const resetAccount = useCallback((initialBalance: number = 10000) => {
     setHoldings([]);
     setOrders([]);
     setTransactions([

@@ -17,7 +17,7 @@ export const PortfolioChart: React.FC = () => {
 
   // Dynamically generate authentic historical trajectory leading to current live portfolio value
   const chartData = useMemo(() => {
-    const currentVal = totalPortfolioValue > 0 ? totalPortfolioValue : 50000;
+    const currentVal = totalPortfolioValue > 0 ? totalPortfolioValue : 10000;
     const baseInvested = totalInvested > 0 ? (totalInvested + virtualCash) : currentVal;
     const profit = totalPnL;
 

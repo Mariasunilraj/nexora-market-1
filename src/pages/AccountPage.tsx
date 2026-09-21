@@ -70,6 +70,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({
   // Profile Form States
   const [depositAmount, setDepositAmount] = useState<number>(10000);
   const [withdrawAmount, setWithdrawAmount] = useState<number>(1000);
+  const [selectedResetAmount, setSelectedResetAmount] = useState<number>(10000);
+  const [isCustomReset, setIsCustomReset] = useState<boolean>(false);
+  const [customResetValue, setCustomResetValue] = useState<string>('');
   const [editName, setEditName] = useState(userProfile.name);
   const [editEmail, setEditEmail] = useState(userProfile.email);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
@@ -223,9 +226,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({
   };
 
   const handleReset = () => {
-    resetAccount(50000);
+    const finalAmount = isCustomReset ? (parseFloat(customResetValue) || 10000) : selectedResetAmount;
+    if (finalAmount <= 0) {
+      alert('Please specify a valid starting balance greater than $0.');
+      return;
+    }
+    resetAccount(finalAmount);
     setIsResetModalOpen(false);
-    setActionNotice('Paper Trading Account reset to initial $50,000 balance.');
+    setActionNotice(`Paper Trading Account reset to initial $${finalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD balance.`);
     setTimeout(() => setActionNotice(null), 4000);
   };
 
@@ -1272,15 +1280,16 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
           <p className="text-xs text-slate-500 dark:text-zinc-400">
             Select or enter the amount of virtual USD to add to your paper trading balance:
           </p>
-          <div className="grid grid-cols-3 gap-2">
-            {[5000, 10000, 25000].map((amt) => (
+          <div className="grid grid-cols-4 gap-2">
+            {[1000, 5000, 10000, 25000].map((amt) => (
               <button
                 key={amt}
+                type="button"
                 onClick={() => setDepositAmount(amt)}
                 className={`py-2 text-xs font-mono font-bold border transition-all ${
                   depositAmount === amt
                     ? 'border-emerald-600 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                    : 'border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-300'
+                    : 'border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 text-slate-600 dark:text-zinc-300'
                 }`}
               >
                 +${amt.toLocaleString()}
@@ -1346,25 +1355,106 @@ ${transactions.slice(0, 10).map(t => `${t.date} | ${t.type.padEnd(8)} | ${t.desc
         title="Reset Paper Trading Account"
       >
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-            <p className="text-xs font-semibold">
-              Warning: Resetting your account will clear all current holdings, orders, and reset virtual equity to $50,000.
+          <div className="flex items-start gap-3 p-3 bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div className="text-xs space-y-1">
+              <p className="font-bold uppercase tracking-wider">Warning: Account Reset</p>
+              <p className="text-slate-600 dark:text-zinc-300">
+                This will liquidate all open positions, cancel active orders, and reset your virtual balance to your chosen starting portfolio amount.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-2">
+              Select Starting Capital Preset
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { amount: 10000, title: '$10,000.00 USD', desc: 'Realistic starter portfolio', rec: true },
+                { amount: 25000, title: '$25,000.00 USD', desc: 'US PDT day trading threshold' },
+                { amount: 5000, title: '$5,000.00 USD', desc: 'Small account simulation' },
+                { amount: 1000, title: '$1,000.00 USD', desc: 'Micro beginner balance' },
+              ].map((preset) => {
+                const isSelected = !isCustomReset && selectedResetAmount === preset.amount;
+                return (
+                  <button
+                    key={preset.amount}
+                    type="button"
+                    onClick={() => {
+                      setSelectedResetAmount(preset.amount);
+                      setIsCustomReset(false);
+                    }}
+                    className={`p-2.5 text-left border transition-all ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-500/10 dark:border-[#3B82F6] dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'
+                        : 'border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 bg-slate-50 dark:bg-zinc-900/50 text-slate-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-xs">{preset.title}</span>
+                      {preset.rec && (
+                        <span className="text-[9px] px-1.5 py-0.5 uppercase font-bold bg-blue-600 text-white dark:bg-[#3B82F6]">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <span className="block text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
+                      {preset.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400">
+                Or Enter Custom Starting Capital ($)
+              </label>
+              {isCustomReset && (
+                <span className="text-[10px] font-mono text-blue-600 dark:text-[#3B82F6] uppercase font-bold">
+                  Custom Balance Active
+                </span>
+              )}
+            </div>
+            <div className="relative flex items-center">
+              <span className="absolute left-3 font-mono font-bold text-slate-400 dark:text-zinc-500 text-sm">$</span>
+              <input
+                type="number"
+                placeholder="e.g. 2500, 50000, 100000"
+                value={customResetValue}
+                onFocus={() => setIsCustomReset(true)}
+                onChange={(e) => {
+                  setCustomResetValue(e.target.value);
+                  setIsCustomReset(true);
+                }}
+                className={`w-full bg-slate-50 dark:bg-zinc-900 border px-4 py-2 pl-7 font-mono text-sm font-bold text-slate-900 dark:text-white focus:outline-none ${
+                  isCustomReset ? 'border-blue-500' : 'border-slate-200 dark:border-zinc-700'
+                }`}
+              />
+            </div>
+            <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1 font-mono">
+              Account will be initialized with:{' '}
+              <strong className="text-slate-900 dark:text-white">
+                ${(isCustomReset ? (parseFloat(customResetValue) || 0) : selectedResetAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+              </strong>
             </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <button
               onClick={() => setIsResetModalOpen(false)}
-              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              className="flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleReset}
-              className="flex-1 py-2 text-xs font-semibold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500"
+              className="flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 transition-colors"
             >
-              Yes, Reset
+              Confirm Reset
             </button>
           </div>
         </div>

@@ -98,7 +98,7 @@ export class UserService {
     const primaryHash = secureHash('Sunil@08', salt);
 
     if (primaryUser) {
-      // Update password to Sunil@08 while preserving all existing cash, holdings, orders & transactions
+      // Update password to Sunil@08
       primaryUser.salt = salt;
       primaryUser.passwordHash = primaryHash;
       primaryUser.username = primaryUsername;
@@ -110,6 +110,154 @@ export class UserService {
           memberSince: '2025',
           plan: 'Paper Trading Pro',
         };
+      }
+
+      // If holdings are empty, seed with active shares in AAPL, NVDA, MSFT, TSLA
+      if (!primaryUser.data.holdings || primaryUser.data.holdings.length === 0) {
+        primaryUser.data.cash = 8520.50;
+        primaryUser.data.buyingPower = 8520.50;
+        primaryUser.data.holdings = [
+          {
+            id: 'h-aapl-1',
+            symbol: 'AAPL',
+            company: 'Apple Inc.',
+            shares: 15,
+            avgPrice: 218.40,
+            currentPrice: 228.45,
+            totalValue: 3426.75,
+            pnl: 150.75,
+            pnlPercent: 4.60,
+            category: 'Stocks',
+          },
+          {
+            id: 'h-nvda-2',
+            symbol: 'NVDA',
+            company: 'NVIDIA Corporation',
+            shares: 20,
+            avgPrice: 119.50,
+            currentPrice: 128.50,
+            totalValue: 2570.00,
+            pnl: 180.00,
+            pnlPercent: 7.53,
+            category: 'Stocks',
+          },
+          {
+            id: 'h-msft-3',
+            symbol: 'MSFT',
+            company: 'Microsoft Corporation',
+            shares: 5,
+            avgPrice: 432.00,
+            currentPrice: 448.20,
+            totalValue: 2241.00,
+            pnl: 81.00,
+            pnlPercent: 3.75,
+            category: 'Stocks',
+          },
+          {
+            id: 'h-tsla-4',
+            symbol: 'TSLA',
+            company: 'Tesla Inc.',
+            shares: 10,
+            avgPrice: 208.50,
+            currentPrice: 218.80,
+            totalValue: 2188.00,
+            pnl: 103.00,
+            pnlPercent: 4.94,
+            category: 'Stocks',
+          }
+        ];
+        primaryUser.data.orders = [
+          {
+            id: 'ord-tsla-4',
+            symbol: 'TSLA',
+            company: 'Tesla Inc.',
+            type: 'Buy',
+            quantity: 10,
+            price: 208.50,
+            orderType: 'Market',
+            status: 'Filled',
+            createdAt: 'Sep 18, 2026 10:15 AM',
+            filledAt: 'Sep 18, 2026 10:15 AM',
+          },
+          {
+            id: 'ord-msft-3',
+            symbol: 'MSFT',
+            company: 'Microsoft Corporation',
+            type: 'Buy',
+            quantity: 5,
+            price: 432.00,
+            orderType: 'Market',
+            status: 'Filled',
+            createdAt: 'Sep 17, 2026 02:40 PM',
+            filledAt: 'Sep 17, 2026 02:40 PM',
+          },
+          {
+            id: 'ord-nvda-2',
+            symbol: 'NVDA',
+            company: 'NVIDIA Corporation',
+            type: 'Buy',
+            quantity: 20,
+            price: 119.50,
+            orderType: 'Market',
+            status: 'Filled',
+            createdAt: 'Sep 16, 2026 11:30 AM',
+            filledAt: 'Sep 16, 2026 11:30 AM',
+          },
+          {
+            id: 'ord-aapl-1',
+            symbol: 'AAPL',
+            company: 'Apple Inc.',
+            type: 'Buy',
+            quantity: 15,
+            price: 218.40,
+            orderType: 'Market',
+            status: 'Filled',
+            createdAt: 'Sep 15, 2026 09:45 AM',
+            filledAt: 'Sep 15, 2026 09:45 AM',
+          }
+        ];
+        primaryUser.data.transactions = [
+          {
+            id: 'tx-tsla-4',
+            date: 'Sep 18, 2026 10:15 AM',
+            type: 'Buy',
+            description: 'Bought 10 shares of TSLA',
+            amount: -2085.00,
+            balance: 8520.50,
+          },
+          {
+            id: 'tx-msft-3',
+            date: 'Sep 17, 2026 02:40 PM',
+            type: 'Buy',
+            description: 'Bought 5 shares of MSFT',
+            amount: -2160.00,
+            balance: 10605.50,
+          },
+          {
+            id: 'tx-nvda-2',
+            date: 'Sep 16, 2026 11:30 AM',
+            type: 'Buy',
+            description: 'Bought 20 shares of NVDA',
+            amount: -2390.00,
+            balance: 12765.50,
+          },
+          {
+            id: 'tx-aapl-1',
+            date: 'Sep 15, 2026 09:45 AM',
+            type: 'Buy',
+            description: 'Bought 15 shares of AAPL',
+            amount: -3276.00,
+            balance: 15155.50,
+          },
+          {
+            id: 'tx-welcome',
+            date: 'Sep 15, 2026 09:30 AM',
+            type: 'Deposit',
+            description: 'Welcome Virtual Deposit',
+            amount: 18431.50,
+            balance: 18431.50,
+          }
+        ];
       }
     } else {
       const formattedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -127,18 +275,148 @@ export class UserService {
           plan: 'Paper Trading Pro',
         },
         data: {
-          cash: 50000.00,
-          buyingPower: 50000.00,
-          holdings: [],
-          orders: [],
+          cash: 8520.50,
+          buyingPower: 8520.50,
+          holdings: [
+            {
+              id: 'h-aapl-1',
+              symbol: 'AAPL',
+              company: 'Apple Inc.',
+              shares: 15,
+              avgPrice: 218.40,
+              currentPrice: 228.45,
+              totalValue: 3426.75,
+              pnl: 150.75,
+              pnlPercent: 4.60,
+              category: 'Stocks',
+            },
+            {
+              id: 'h-nvda-2',
+              symbol: 'NVDA',
+              company: 'NVIDIA Corporation',
+              shares: 20,
+              avgPrice: 119.50,
+              currentPrice: 128.50,
+              totalValue: 2570.00,
+              pnl: 180.00,
+              pnlPercent: 7.53,
+              category: 'Stocks',
+            },
+            {
+              id: 'h-msft-3',
+              symbol: 'MSFT',
+              company: 'Microsoft Corporation',
+              shares: 5,
+              avgPrice: 432.00,
+              currentPrice: 448.20,
+              totalValue: 2241.00,
+              pnl: 81.00,
+              pnlPercent: 3.75,
+              category: 'Stocks',
+            },
+            {
+              id: 'h-tsla-4',
+              symbol: 'TSLA',
+              company: 'Tesla Inc.',
+              shares: 10,
+              avgPrice: 208.50,
+              currentPrice: 218.80,
+              totalValue: 2188.00,
+              pnl: 103.00,
+              pnlPercent: 4.94,
+              category: 'Stocks',
+            }
+          ],
+          orders: [
+            {
+              id: 'ord-tsla-4',
+              symbol: 'TSLA',
+              company: 'Tesla Inc.',
+              type: 'Buy',
+              quantity: 10,
+              price: 208.50,
+              orderType: 'Market',
+              status: 'Filled',
+              createdAt: 'Sep 18, 2026 10:15 AM',
+              filledAt: 'Sep 18, 2026 10:15 AM',
+            },
+            {
+              id: 'ord-msft-3',
+              symbol: 'MSFT',
+              company: 'Microsoft Corporation',
+              type: 'Buy',
+              quantity: 5,
+              price: 432.00,
+              orderType: 'Market',
+              status: 'Filled',
+              createdAt: 'Sep 17, 2026 02:40 PM',
+              filledAt: 'Sep 17, 2026 02:40 PM',
+            },
+            {
+              id: 'ord-nvda-2',
+              symbol: 'NVDA',
+              company: 'NVIDIA Corporation',
+              type: 'Buy',
+              quantity: 20,
+              price: 119.50,
+              orderType: 'Market',
+              status: 'Filled',
+              createdAt: 'Sep 16, 2026 11:30 AM',
+              filledAt: 'Sep 16, 2026 11:30 AM',
+            },
+            {
+              id: 'ord-aapl-1',
+              symbol: 'AAPL',
+              company: 'Apple Inc.',
+              type: 'Buy',
+              quantity: 15,
+              price: 218.40,
+              orderType: 'Market',
+              status: 'Filled',
+              createdAt: 'Sep 15, 2026 09:45 AM',
+              filledAt: 'Sep 15, 2026 09:45 AM',
+            }
+          ],
           transactions: [
             {
-              id: `tx-${Date.now()}`,
-              date: formattedDate + ' 09:30 AM',
+              id: 'tx-tsla-4',
+              date: 'Sep 18, 2026 10:15 AM',
+              type: 'Buy',
+              description: 'Bought 10 shares of TSLA',
+              amount: -2085.00,
+              balance: 8520.50,
+            },
+            {
+              id: 'tx-msft-3',
+              date: 'Sep 17, 2026 02:40 PM',
+              type: 'Buy',
+              description: 'Bought 5 shares of MSFT',
+              amount: -2160.00,
+              balance: 10605.50,
+            },
+            {
+              id: 'tx-nvda-2',
+              date: 'Sep 16, 2026 11:30 AM',
+              type: 'Buy',
+              description: 'Bought 20 shares of NVDA',
+              amount: -2390.00,
+              balance: 12765.50,
+            },
+            {
+              id: 'tx-aapl-1',
+              date: 'Sep 15, 2026 09:45 AM',
+              type: 'Buy',
+              description: 'Bought 15 shares of AAPL',
+              amount: -3276.00,
+              balance: 15155.50,
+            },
+            {
+              id: 'tx-welcome',
+              date: 'Sep 15, 2026 09:30 AM',
               type: 'Deposit',
               description: 'Welcome Virtual Deposit',
-              amount: 50000.00,
-              balance: 50000.00,
+              amount: 18431.50,
+              balance: 18431.50,
             }
           ],
           settings: DEFAULT_SETTINGS,
@@ -146,7 +424,7 @@ export class UserService {
             {
               id: `notif-${Date.now()}`,
               title: 'Welcome to NEXORA!',
-              message: 'Account active. $50,000 virtual cash is available for trading.',
+              message: 'Account active. Live holdings in AAPL, NVDA, MSFT, and TSLA are available in your portfolio.',
               time: 'Just now',
               type: 'account',
               read: false,
@@ -195,8 +473,8 @@ export class UserService {
               plan: 'Paper Trading Pro',
             },
             data: {
-              cash: cloudData?.cash ?? 50000,
-              buyingPower: cloudData?.buyingPower ?? 50000,
+              cash: cloudData?.cash ?? 10000,
+              buyingPower: cloudData?.buyingPower ?? 10000,
               holdings: cloudData?.holdings || [],
               orders: cloudData?.orders || [],
               transactions: cloudData?.transactions || [],
@@ -302,9 +580,9 @@ export class UserService {
             username: cleanUsername,
             email: cleanEmail,
             full_name: capitalizedName,
-            virtual_cash: 50000.00,
-            buying_power: 50000.00,
-            total_equity: 50000.00,
+            virtual_cash: 10000.00,
+            buying_power: 10000.00,
+            total_equity: 10000.00,
             plan: 'Paper Trading Pro',
             updated_at: new Date().toISOString(),
           }).then(() => {});
@@ -313,8 +591,8 @@ export class UserService {
             user_id: userId,
             type: 'Deposit',
             description: 'Welcome Virtual Deposit',
-            amount: 50000.00,
-            balance: 50000.00,
+            amount: 10000.00,
+            balance: 10000.00,
             created_at: new Date().toISOString(),
           }).then(() => {});
         }
@@ -338,8 +616,8 @@ export class UserService {
         plan: 'Paper Trading Pro',
       },
       data: {
-        cash: 50000.00,
-        buyingPower: 50000.00,
+        cash: 10000.00,
+        buyingPower: 10000.00,
         holdings: [],
         orders: [],
         transactions: [
@@ -348,8 +626,8 @@ export class UserService {
             date: formattedDate + ' 09:30 AM',
             type: 'Deposit',
             description: 'Welcome Virtual Deposit',
-            amount: 50000.00,
-            balance: 50000.00,
+            amount: 10000.00,
+            balance: 10000.00,
           }
         ],
         settings: DEFAULT_SETTINGS,
@@ -357,7 +635,7 @@ export class UserService {
           {
             id: `notif-${Date.now()}`,
             title: 'Welcome to NEXORA!',
-            message: `Account created for ${capitalizedName}. $50,000 virtual cash has been credited.`,
+            message: `Account created for ${capitalizedName}. $10,000 virtual starter cash has been credited.`,
             time: 'Just now',
             type: 'account',
             read: false,
@@ -421,8 +699,8 @@ export class UserService {
               plan: 'Paper Trading Pro',
             },
             data: {
-              cash: cloudData?.cash ?? 50000,
-              buyingPower: cloudData?.buyingPower ?? 50000,
+              cash: cloudData?.cash ?? 10000,
+              buyingPower: cloudData?.buyingPower ?? 10000,
               holdings: cloudData?.holdings || [],
               orders: cloudData?.orders || [],
               transactions: cloudData?.transactions || [],

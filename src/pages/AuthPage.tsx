@@ -371,7 +371,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 type="submit"
                 className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors"
               >
-                Register Account ($50,000 Free Cash)
+                Register Account ($10,000 Starter Cash)
               </button>
             </form>
 
