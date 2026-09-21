@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type {
   StockQuote,
   Holding,
@@ -14,6 +14,7 @@ import type {
 import { INITIAL_STOCKS, INITIAL_MARKET_INDICES } from '../services/marketDataService';
 import { finnhubClient } from '../services/finnhubService';
 import { userDB, UserAccount } from '../services/userService';
+import { cloudTradingService } from '../services/cloudTradingService';
 
 interface TradingContextType {
   stocks: StockQuote[];
@@ -59,9 +60,8 @@ interface TradingContextType {
   isLiveApiConnected: boolean;
   refreshAllQuotes: () => Promise<void>;
   loadUserSession: (user: any) => void;
+  refreshCloudData: () => Promise<void>;
 }
-
-
 
 const INITIAL_PROFILE: UserProfile = {
   name: 'Trader',
@@ -84,7 +84,7 @@ const INITIAL_SETTINGS: UserSettings = {
     promotions: true,
   },
   display: {
-    theme: 'dark', // Keep user dark/light preference
+    theme: 'dark',
     sidebarPosition: 'left',
     pageLayout: 'full',
     rowsPerPage: 10,
@@ -104,69 +104,24 @@ const INITIAL_SETTINGS: UserSettings = {
 const TradingContext = createContext<TradingContextType | undefined>(undefined);
 
 export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [stocks, setStocks] = useState<StockQuote[]>(() => {
-    const saved = localStorage.getItem('nexora_stocks_v3');
-    return saved ? JSON.parse(saved) : INITIAL_STOCKS;
-  });
-
-  const [holdings, setHoldings] = useState<Holding[]>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.data.holdings : [];
-  });
-
-  const [orders, setOrders] = useState<Order[]>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.data.orders : [];
-  });
-
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.data.transactions : [];
-  });
-
+  const [stocks, setStocks] = useState<StockQuote[]>(INITIAL_STOCKS);
+  const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [indices] = useState<MarketIndex[]>(INITIAL_MARKET_INDICES);
-
-  const [virtualCash, setVirtualCash] = useState<number>(() => {
-    const user = userDB.getActiveUser();
-    return user && typeof user.data.cash === 'number' ? user.data.cash : 50000;
-  });
-
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.profile : INITIAL_PROFILE;
-  });
-
-  const [settings, setSettings] = useState<UserSettings>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.data.settings : INITIAL_SETTINGS;
-  });
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const user = userDB.getActiveUser();
-    return user ? user.data.notifications : [];
-  });
-
+  const [virtualCash, setVirtualCash] = useState<number>(50000);
+  const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_PROFILE);
+  const [settings, setSettings] = useState<UserSettings>(INITIAL_SETTINGS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isLiveApiConnected, setIsLiveApiConnected] = useState<boolean>(true);
 
-  // Sync state changes to Database & LocalStorage
-  useEffect(() => {
-    const currentId = userDB.getActiveUserId();
-    if (!currentId) return;
+  const isSyncingRef = useRef<boolean>(false);
 
-    userDB.updateActiveUserData({
-      cash: virtualCash,
-      holdings,
-      orders,
-      transactions,
-      settings,
-      notifications,
-      profile: userProfile,
-    });
-  }, [virtualCash, holdings, orders, transactions, settings, notifications, userProfile]);
-
+  // Helper to load user session into React state
   const loadUserSession = useCallback((user: UserAccount) => {
+    if (!user) return;
     setUserProfile(user.profile);
-    setVirtualCash(user.data.cash);
+    setVirtualCash(typeof user.data.cash === 'number' ? user.data.cash : 50000);
     setHoldings(user.data.holdings || []);
     setOrders(user.data.orders || []);
     setTransactions(user.data.transactions || []);
@@ -174,16 +129,50 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setNotifications(user.data.notifications || []);
   }, []);
 
+  // Fetch full live cloud portfolio from Supabase
+  const refreshCloudData = useCallback(async () => {
+    const activeId = userDB.getActiveUserId();
+    if (!activeId) return;
+
+    const cloudData = await cloudTradingService.fetchCloudUserData(activeId);
+    if (cloudData) {
+      setUserProfile(cloudData.profile);
+      setVirtualCash(cloudData.cash);
+      setHoldings(cloudData.holdings);
+      setOrders(cloudData.orders);
+      setTransactions(cloudData.transactions);
+    }
+  }, []);
+
+  // Initial cloud sync and multi-device Realtime WebSocket listener
+  useEffect(() => {
+    const activeUser = userDB.getActiveUser();
+    if (activeUser) {
+      loadUserSession(activeUser);
+      refreshCloudData();
+    }
+
+    const activeId = userDB.getActiveUserId();
+    if (!activeId) return;
+
+    // Realtime multi-device subscription: updates phone when laptop trades, and vice versa!
+    const unsubscribe = cloudTradingService.subscribeToCloudRealtime(activeId, () => {
+      refreshCloudData();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [loadUserSession, refreshCloudData]);
+
   // Compute accurate Realized & Unrealized P&L
   const totalHoldingsValue = holdings.reduce((acc, h) => acc + h.shares * h.currentPrice, 0);
   const totalInvested = holdings.reduce((acc, h) => acc + h.shares * h.avgPrice, 0);
   const totalPortfolioValue = totalHoldingsValue + virtualCash;
   
-  // Total P&L is the exact gain from all current positions
   const totalPnL = totalHoldingsValue - totalInvested;
   const totalPnLPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
 
-  // Today's P&L based on day's price movements
   const todaysPnL = holdings.reduce((acc, h) => {
     const stock = stocks.find(s => s.symbol === h.symbol);
     const dayDelta = stock ? stock.change : 0;
@@ -192,7 +181,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   
   const todaysPnLPercent = totalPortfolioValue > 0 ? (todaysPnL / totalPortfolioValue) * 100 : 2.42;
 
-  // Open buy limit orders reserve buying power
+  // Reserved cash for open buy limit orders
   const reservedCash = orders
     .filter(o => o.status === 'Open' && o.type === 'Buy')
     .reduce((acc, o) => acc + o.quantity * o.price, 0);
@@ -254,12 +243,11 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [fetchLiveQuote]);
 
-  // Fetch real Finnhub quotes on initial load
   useEffect(() => {
     refreshAllQuotes();
   }, [refreshAllQuotes]);
 
-  // Periodic Finnhub update (every 10 seconds)
+  // Periodic Finnhub update
   useEffect(() => {
     const timer = setInterval(() => {
       const topSymbols = ['AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN'];
@@ -270,7 +258,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => clearInterval(timer);
   }, [fetchLiveQuote]);
 
-  // Synchronize holding current prices with stocks list
+  // Sync holding prices
   useEffect(() => {
     setHoldings(prevHoldings => {
       let changed = false;
@@ -296,7 +284,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, [stocks]);
 
-  // Execute Order
+  // Execute Order with instant Supabase Cloud persistence
   const executeOrder = useCallback(({
     symbol,
     type,
@@ -325,6 +313,8 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const formattedDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
       ' ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+    const activeUserId = userDB.getActiveUserId();
+
     if (type === 'Buy') {
       if (totalOrderCost > buyingPower) {
         return {
@@ -347,20 +337,16 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
         setOrders(prev => [newOrder, ...prev]);
 
-        setNotifications(prev => [{
-          id: `notif-${Date.now()}`,
-          title: 'Limit Order Placed',
-          message: `Buy Limit order for ${quantity} shares of ${stock.symbol} at $${executionPrice}`,
-          time: formattedDate,
-          type: 'order',
-          read: false
-        }, ...prev]);
+        if (activeUserId) {
+          cloudTradingService.recordOrderInCloud(activeUserId, newOrder);
+        }
 
         return { success: true, message: `Limit Order placed for ${quantity} ${stock.symbol} @ $${executionPrice}` };
       } else {
         const newVirtualCash = +(virtualCash - totalOrderCost).toFixed(2);
         setVirtualCash(newVirtualCash);
 
+        let updatedHoldings: Holding[] = [];
         setHoldings(prev => {
           const existing = prev.find(h => h.symbol === stock.symbol);
           if (existing) {
@@ -371,7 +357,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const pnl = +((stock.price - newAvgPrice) * totalShares).toFixed(2);
             const pnlPercent = +(((stock.price - newAvgPrice) / newAvgPrice) * 100).toFixed(2);
 
-            return prev.map(h => h.symbol === stock.symbol ? {
+            updatedHoldings = prev.map(h => h.symbol === stock.symbol ? {
               ...h,
               shares: totalShares,
               avgPrice: newAvgPrice,
@@ -393,8 +379,9 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               pnlPercent: 0,
               category: stock.category || 'Stocks'
             };
-            return [...prev, newHolding];
+            updatedHoldings = [...prev, newHolding];
           }
+          return updatedHoldings;
         });
 
         const newOrder: Order = {
@@ -421,14 +408,13 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
         setTransactions(prev => [newTx, ...prev]);
 
-        setNotifications(prev => [{
-          id: `notif-${Date.now()}`,
-          title: 'Order Filled',
-          message: `Bought ${quantity} shares of ${stock.symbol} at $${stock.price}`,
-          time: formattedDate,
-          type: 'order',
-          read: false
-        }, ...prev]);
+        // Sync to Supabase Cloud
+        if (activeUserId) {
+          cloudTradingService.updateCloudProfile(activeUserId, { virtualCash: newVirtualCash });
+          cloudTradingService.syncHoldingsToCloud(activeUserId, updatedHoldings);
+          cloudTradingService.recordOrderInCloud(activeUserId, newOrder);
+          cloudTradingService.recordTransactionInCloud(activeUserId, newTx);
+        }
 
         return { success: true, message: `Successfully purchased ${quantity} shares of ${stock.symbol} for $${totalOrderCost.toLocaleString()}` };
       }
@@ -454,13 +440,19 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           createdAt: formattedDate,
         };
         setOrders(prev => [newOrder, ...prev]);
+
+        if (activeUserId) {
+          cloudTradingService.recordOrderInCloud(activeUserId, newOrder);
+        }
+
         return { success: true, message: `Sell Limit Order placed for ${quantity} ${stock.symbol} @ $${executionPrice}` };
       } else {
         const newVirtualCash = +(virtualCash + totalOrderCost).toFixed(2);
         setVirtualCash(newVirtualCash);
 
+        let updatedHoldings: Holding[] = [];
         setHoldings(prev => {
-          return prev.map(h => {
+          updatedHoldings = prev.map(h => {
             if (h.symbol === stock.symbol) {
               const remainingShares = h.shares - quantity;
               if (remainingShares <= 0) return null;
@@ -477,6 +469,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
             return h;
           }).filter(Boolean) as Holding[];
+          return updatedHoldings;
         });
 
         const newOrder: Order = {
@@ -503,6 +496,14 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
         setTransactions(prev => [newTx, ...prev]);
 
+        // Sync to Supabase Cloud
+        if (activeUserId) {
+          cloudTradingService.updateCloudProfile(activeUserId, { virtualCash: newVirtualCash });
+          cloudTradingService.syncHoldingsToCloud(activeUserId, updatedHoldings);
+          cloudTradingService.recordOrderInCloud(activeUserId, newOrder);
+          cloudTradingService.recordTransactionInCloud(activeUserId, newTx);
+        }
+
         return { success: true, message: `Successfully sold ${quantity} shares of ${stock.symbol} for +$${totalOrderCost.toLocaleString()}` };
       }
     }
@@ -518,6 +519,11 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return ord;
       });
     });
+
+    const activeUserId = userDB.getActiveUserId();
+    if (activeUserId) {
+      cloudTradingService.updateOrderStatusInCloud(activeUserId, orderId, 'Cancelled');
+    }
   }, []);
 
   // Deposit Virtual Cash
@@ -540,14 +546,11 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     setTransactions(prev => [newTx, ...prev]);
 
-    setNotifications(prev => [{
-      id: `notif-${Date.now()}`,
-      title: 'Deposit Successful',
-      message: `+$${amount.toLocaleString()} added to your virtual cash balance.`,
-      time: formattedDate,
-      type: 'account',
-      read: false
-    }, ...prev]);
+    const activeUserId = userDB.getActiveUserId();
+    if (activeUserId) {
+      cloudTradingService.updateCloudProfile(activeUserId, { virtualCash: newBal });
+      cloudTradingService.recordTransactionInCloud(activeUserId, newTx);
+    }
   }, [virtualCash]);
 
   // Withdraw Virtual Cash
@@ -574,6 +577,12 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     setTransactions(prev => [newTx, ...prev]);
 
+    const activeUserId = userDB.getActiveUserId();
+    if (activeUserId) {
+      cloudTradingService.updateCloudProfile(activeUserId, { virtualCash: newBal });
+      cloudTradingService.recordTransactionInCloud(activeUserId, newTx);
+    }
+
     return { success: true, message: `Successfully withdrew $${amount.toLocaleString()}` };
   }, [virtualCash, buyingPower]);
 
@@ -592,6 +601,11 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     ]);
     setVirtualCash(initialBalance);
+
+    const activeUserId = userDB.getActiveUserId();
+    if (activeUserId) {
+      cloudTradingService.resetCloudAccount(activeUserId, initialBalance);
+    }
   }, []);
 
   const toggleFavorite = useCallback((symbol: string) => {
@@ -614,6 +628,14 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateProfile = useCallback((newProfile: Partial<UserProfile>) => {
     setUserProfile(prev => ({ ...prev, ...newProfile }));
+    const activeUserId = userDB.getActiveUserId();
+    if (activeUserId) {
+      cloudTradingService.updateCloudProfile(activeUserId, {
+        name: newProfile.name,
+        avatarUrl: newProfile.avatarUrl,
+        plan: newProfile.plan,
+      });
+    }
   }, []);
 
   const markNotificationRead = useCallback((id: string) => {
@@ -685,6 +707,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         isLiveApiConnected,
         refreshAllQuotes,
         loadUserSession,
+        refreshCloudData,
       }}
     >
       {children}

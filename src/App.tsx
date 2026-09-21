@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { TradingProvider, useTrading } from './context/TradingContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -15,6 +15,8 @@ import { SettingsPage } from './pages/SettingsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AuthPage } from './pages/AuthPage';
 import { userDB, UserAccount } from './services/userService';
+import { supabase } from './services/supabaseClient';
+import { cloudTradingService } from './services/cloudTradingService';
 
 const resolveLandingPage = (landingName?: string): PageId => {
   const clean = (landingName || '').toLowerCase().trim();
@@ -40,7 +42,141 @@ export function AppContent() {
     return resolveLandingPage(activeUser?.data?.settings?.defaultLandingPage);
   });
   const [selectedTradeSymbol, setSelectedTradeSymbol] = useState<string | undefined>('AAPL');
-  const { loadUserSession } = useTrading();
+  const { loadUserSession, refreshCloudData } = useTrading();
+
+  // Multi-device Cloud Session Listener: Auto-syncs when logging in on Phone or Laptop
+  useEffect(() => {
+    if (!supabase) return;
+
+    // Check initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const cloudData = await cloudTradingService.fetchCloudUserData(session.user.id);
+        const userAccount: UserAccount = {
+          id: session.user.id,
+          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Trader',
+          email: session.user.email || '',
+          createdAt: new Date(session.user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          profile: cloudData?.profile || {
+            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Trader',
+            email: session.user.email || '',
+            memberSince: '2025',
+            plan: 'Paper Trading Pro',
+          },
+          data: {
+            cash: cloudData?.cash ?? 50000,
+            buyingPower: cloudData?.buyingPower ?? 50000,
+            holdings: cloudData?.holdings || [],
+            orders: cloudData?.orders || [],
+            transactions: cloudData?.transactions || [],
+            settings: {
+              siteDashboardUrl: 'https://nexora.com/dashboard',
+              defaultLandingPage: 'Portfolio',
+              timezone: '(GMT+05:30) Asia/Kolkata',
+              dateFormat: 'Jul 20, 2025',
+              currency: 'USD - US Dollar',
+              notifications: {
+                priceAlerts: true,
+                orderExecutions: true,
+                dailyMarketSummary: true,
+                weeklyReports: true,
+                promotions: true,
+              },
+              display: {
+                theme: 'dark',
+                sidebarPosition: 'left',
+                pageLayout: 'full',
+                rowsPerPage: 10,
+                chartType: 'line',
+                showMarketOverview: true,
+              },
+              trading: {
+                apiKey: 'da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0',
+                simulationSpeed: 'realtime',
+                commission: 0,
+              },
+              security: {
+                twoFactorEnabled: false,
+              }
+            },
+            notifications: [],
+          }
+        };
+
+        userDB.setActiveUser(userAccount);
+        loadUserSession(userAccount);
+        setIsAuthenticated(true);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const cloudData = await cloudTradingService.fetchCloudUserData(session.user.id);
+        const userAccount: UserAccount = {
+          id: session.user.id,
+          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Trader',
+          email: session.user.email || '',
+          createdAt: new Date().toLocaleDateString('en-US'),
+          profile: cloudData?.profile || {
+            name: session.user.user_metadata?.full_name || 'Trader',
+            email: session.user.email || '',
+            memberSince: '2025',
+            plan: 'Paper Trading Pro',
+          },
+          data: {
+            cash: cloudData?.cash ?? 50000,
+            buyingPower: cloudData?.buyingPower ?? 50000,
+            holdings: cloudData?.holdings || [],
+            orders: cloudData?.orders || [],
+            transactions: cloudData?.transactions || [],
+            settings: {
+              siteDashboardUrl: 'https://nexora.com/dashboard',
+              defaultLandingPage: 'Portfolio',
+              timezone: '(GMT+05:30) Asia/Kolkata',
+              dateFormat: 'Jul 20, 2025',
+              currency: 'USD - US Dollar',
+              notifications: {
+                priceAlerts: true,
+                orderExecutions: true,
+                dailyMarketSummary: true,
+                weeklyReports: true,
+                promotions: true,
+              },
+              display: {
+                theme: 'dark',
+                sidebarPosition: 'left',
+                pageLayout: 'full',
+                rowsPerPage: 10,
+                chartType: 'line',
+                showMarketOverview: true,
+              },
+              trading: {
+                apiKey: 'da0l0ghr01qh1noo3kkgda0l0ghr01qh1noo3kl0',
+                simulationSpeed: 'realtime',
+                commission: 0,
+              },
+              security: {
+                twoFactorEnabled: false,
+              }
+            },
+            notifications: [],
+          }
+        };
+
+        userDB.setActiveUser(userAccount);
+        loadUserSession(userAccount);
+        setIsAuthenticated(true);
+      } else if (event === 'SIGNED_OUT') {
+        userDB.setActiveUser(null);
+        setIsAuthenticated(false);
+        setAuthView('signed-out');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [loadUserSession]);
 
   const handleNavigate = (page: PageId, symbol?: string) => {
     if (symbol) {
@@ -50,8 +186,8 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleLogout = () => {
-    userDB.logout();
+  const handleLogout = async () => {
+    await userDB.logout();
     setIsAuthenticated(false);
     setAuthView('signed-out');
   };
@@ -61,6 +197,7 @@ export function AppContent() {
     setIsAuthenticated(true);
     const targetPage = resolveLandingPage(user.data?.settings?.defaultLandingPage);
     setActivePage(targetPage);
+    refreshCloudData();
   };
 
   if (!isAuthenticated) {

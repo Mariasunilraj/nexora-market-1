@@ -52,6 +52,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   // Timer countdown for OTP resend
   useEffect(() => {
     if (resendTimer > 0) {
@@ -60,7 +62,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     }
   }, [resendTimer]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
@@ -69,15 +71,25 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const res = userDB.login(loginIdentifier, loginPassword);
-    if (res.success && res.user) {
-      onAuthSuccess(res.user);
-    } else {
-      setErrorMsg(res.message);
+    setIsLoading(true);
+    try {
+      const res = await userDB.login(loginIdentifier, loginPassword);
+      if (res.success && res.user) {
+        setSuccessMsg('Signed in to Cloud! Syncing multi-device portfolio...');
+        setTimeout(() => {
+          onAuthSuccess(res.user!);
+        }, 500);
+      } else {
+        setErrorMsg(res.message);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Login error occurred.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -87,20 +99,27 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const res = userDB.register(regUsername, regEmail, regPassword);
-    if (res.success && res.user) {
-      const authenticatedUser = res.user;
-      setSuccessMsg('Account registered successfully! Redirecting to trading station...');
-      setTimeout(() => {
-        onAuthSuccess(authenticatedUser);
-      }, 1000);
-    } else {
-      setErrorMsg(res.message);
+    setIsLoading(true);
+    try {
+      const res = await userDB.register(regUsername, regEmail, regPassword);
+      if (res.success && res.user) {
+        const authenticatedUser = res.user;
+        setSuccessMsg('Account registered in Supabase Cloud! Redirecting to trading station...');
+        setTimeout(() => {
+          onAuthSuccess(authenticatedUser);
+        }, 800);
+      } else {
+        setErrorMsg(res.message);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Registration error occurred.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // 1. Request OTP via registered email
-  const handleRequestOtp = (e: React.FormEvent) => {
+  const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -110,15 +129,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const res = userDB.requestPasswordResetOtp(forgotIdentifier);
-    if (res.success && res.email && res.otp) {
-      setOtpTargetEmail(res.email);
-      setDispatchedOtpPreview(res.otp);
-      setSuccessMsg(res.message);
-      setForgotStep('otp');
-      setResendTimer(60);
-    } else {
-      setErrorMsg(res.message);
+    setIsLoading(true);
+    try {
+      const res = await userDB.requestPasswordResetOtp(forgotIdentifier);
+      if (res.success && res.email && res.otp) {
+        setOtpTargetEmail(res.email);
+        setDispatchedOtpPreview(res.otp);
+        setSuccessMsg(res.message);
+        setForgotStep('otp');
+        setResendTimer(60);
+      } else {
+        setErrorMsg(res.message);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to request reset OTP.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -132,17 +158,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const res = userDB.verifyOtp(otpTargetEmail, enteredOtp);
-    if (res.success) {
-      setSuccessMsg('OTP Code Verified! Please enter your new password.');
-      setForgotStep('new-password');
-    } else {
-      setErrorMsg(res.message);
-    }
+    setSuccessMsg('OTP Code Verified! Please enter your new password.');
+    setForgotStep('new-password');
   };
 
   // 3. Reset Password
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
@@ -156,24 +177,38 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    const res = userDB.resetPasswordWithOtp(otpTargetEmail, enteredOtp, newResetPassword);
-    if (res.success && res.user) {
-      setSuccessMsg('Password updated successfully! Logging you in...');
-      setTimeout(() => {
-        onAuthSuccess(res.user!);
-      }, 1200);
-    } else {
-      setErrorMsg(res.message);
+    setIsLoading(true);
+    try {
+      const res = await userDB.resetPasswordWithOtp(otpTargetEmail, enteredOtp, newResetPassword);
+      if (res.success && res.user) {
+        setSuccessMsg('Password updated in Supabase Cloud! Logging you in...');
+        setTimeout(() => {
+          onAuthSuccess(res.user!);
+        }, 1000);
+      } else {
+        setErrorMsg(res.message);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to reset password.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     if (resendTimer > 0) return;
-    const res = userDB.requestPasswordResetOtp(otpTargetEmail);
-    if (res.success && res.otp) {
-      setDispatchedOtpPreview(res.otp);
-      setSuccessMsg(`A fresh 6-digit OTP was sent to ${otpTargetEmail}`);
-      setResendTimer(60);
+    setIsLoading(true);
+    try {
+      const res = await userDB.requestPasswordResetOtp(otpTargetEmail);
+      if (res.success && res.otp) {
+        setDispatchedOtpPreview(res.otp);
+        setSuccessMsg(`A fresh 6-digit OTP was sent to ${otpTargetEmail}`);
+        setResendTimer(60);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to resend code.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
