@@ -276,6 +276,12 @@ export class UserService {
         });
 
         if (error) {
+          if (error.message?.toLowerCase().includes('email not confirmed')) {
+            return {
+              success: false,
+              message: 'Email confirmation required. Please check your inbox or spam folder for the confirmation email.'
+            };
+          }
           return { success: false, message: error.message };
         }
 
