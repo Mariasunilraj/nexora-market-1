@@ -51,6 +51,7 @@ interface TradingContextType {
   resetAccount: (initialBalance?: number) => void;
   toggleFavorite: (symbol: string) => void;
   addCustomStock: (stock: StockQuote) => void;
+  removeStockFromWatchlist: (symbol: string) => void;
   updateSettings: (newSettings: Partial<UserSettings>) => void;
   updateProfile: (newProfile: Partial<UserProfile>) => void;
   markNotificationRead: (id: string) => void;
@@ -662,6 +663,10 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
+  const removeStockFromWatchlist = useCallback((symbol: string) => {
+    setStocks(prev => prev.filter(s => s.symbol.toUpperCase() !== symbol.toUpperCase()));
+  }, []);
+
   const updateSettings = useCallback((newSettings: Partial<UserSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
@@ -738,6 +743,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         resetAccount,
         toggleFavorite,
         addCustomStock,
+        removeStockFromWatchlist,
         updateSettings,
         updateProfile,
         markNotificationRead,

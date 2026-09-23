@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Star, Zap } from 'lucide-react';
+import { Plus, Search, Star, Zap, Trash2, CheckCircle2 } from 'lucide-react';
 import { useTrading } from '../context/TradingContext';
 import { StockLogo } from '../components/common/StockLogo';
 import { Modal } from '../components/common/Modal';
@@ -10,18 +10,25 @@ interface WatchlistPageProps {
 }
 
 export const WatchlistPage: React.FC<WatchlistPageProps> = ({ onTradeClick }) => {
-  const { stocks, toggleFavorite, addCustomStock, fetchLiveQuote } = useTrading();
+  const { stocks, toggleFavorite, addCustomStock, removeStockFromWatchlist, fetchLiveQuote } = useTrading();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addTickerInput, setAddTickerInput] = useState('');
   const [searchingLive, setSearchingLive] = useState(false);
   const [searchedQuote, setSearchedQuote] = useState<StockQuote | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [removeNotice, setRemoveNotice] = useState<string | null>(null);
 
   const filteredStocks = stocks.filter(
     s => s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
          s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleRemoveStock = (symbol: string) => {
+    removeStockFromWatchlist(symbol);
+    setRemoveNotice(`Removed ${symbol} from watchlist.`);
+    setTimeout(() => setRemoveNotice(null), 3500);
+  };
 
   const handleSearchLiveTicker = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +52,29 @@ export const WatchlistPage: React.FC<WatchlistPageProps> = ({ onTradeClick }) =>
       setIsAddModalOpen(false);
       setAddTickerInput('');
       setSearchedQuote(null);
+      setRemoveNotice(`Added ${searchedQuote.symbol} to watchlist.`);
+      setTimeout(() => setRemoveNotice(null), 3500);
     }
   };
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Toast Notice */}
+      {removeNotice && (
+        <div className="p-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600" />
+            <span>{removeNotice}</span>
+          </div>
+          <button
+            onClick={() => setRemoveNotice(null)}
+            className="text-zinc-400 hover:text-white dark:hover:text-zinc-900 text-xs font-mono"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Top Action Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <button
@@ -88,55 +113,77 @@ export const WatchlistPage: React.FC<WatchlistPageProps> = ({ onTradeClick }) =>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredStocks.map((s) => {
-                const isUp = s.change >= 0;
-                return (
-                  <tr
-                    key={s.symbol}
-                    className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <td className="py-3.5 pl-2 font-bold text-zinc-900 dark:text-white flex items-center gap-2.5">
-                      <StockLogo symbol={s.symbol} size="sm" />
-                      <span>{s.symbol}</span>
-                    </td>
-                    <td className="py-3.5 text-zinc-600 dark:text-zinc-400 text-xs">
-                      {s.name}
-                    </td>
-                    <td className="py-3.5 text-right font-mono font-bold text-zinc-900 dark:text-white">
-                      ${s.price.toFixed(2)}
-                    </td>
-                    <td className={`py-3.5 text-right font-mono font-semibold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                      {isUp ? `+${s.change.toFixed(2)}` : s.change.toFixed(2)}
-                    </td>
-                    <td className={`py-3.5 text-right font-mono font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                      {isUp ? `+${s.changePercent.toFixed(2)}%` : `${s.changePercent.toFixed(2)}%`}
-                    </td>
-                    <td className="py-3.5 text-right font-mono text-zinc-500 dark:text-zinc-400">
-                      {s.marketCap}
-                    </td>
-                    <td className="py-3.5 text-center pr-2">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => toggleFavorite(s.symbol)}
-                          className={`p-1.5 border transition-colors ${
-                            s.isFavorite
-                              ? 'text-amber-500 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20'
-                              : 'text-zinc-400 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white'
-                          }`}
-                        >
-                          <Star className={`w-3.5 h-3.5 ${s.isFavorite ? 'fill-current' : ''}`} />
-                        </button>
-                        <button
-                          onClick={() => onTradeClick && onTradeClick(s.symbol)}
-                          className="px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors"
-                        >
-                          Trade
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredStocks.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-zinc-500 dark:text-zinc-400">
+                    <p className="text-xs font-semibold mb-2">No stocks currently in watchlist.</p>
+                    <button
+                      onClick={() => setIsAddModalOpen(true)}
+                      className="px-3 py-1.5 bg-blue-600 text-white font-bold text-xs uppercase tracking-wider"
+                    >
+                      + Add Stock
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                filteredStocks.map((s) => {
+                  const isUp = s.change >= 0;
+                  return (
+                    <tr
+                      key={s.symbol}
+                      className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                    >
+                      <td className="py-3.5 pl-2 font-bold text-zinc-900 dark:text-white flex items-center gap-2.5">
+                        <StockLogo symbol={s.symbol} size="sm" />
+                        <span>{s.symbol}</span>
+                      </td>
+                      <td className="py-3.5 text-zinc-600 dark:text-zinc-400 text-xs">
+                        {s.name}
+                      </td>
+                      <td className="py-3.5 text-right font-mono font-bold text-zinc-900 dark:text-white">
+                        ${s.price.toFixed(2)}
+                      </td>
+                      <td className={`py-3.5 text-right font-mono font-semibold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {isUp ? `+${s.change.toFixed(2)}` : s.change.toFixed(2)}
+                      </td>
+                      <td className={`py-3.5 text-right font-mono font-bold ${isUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {isUp ? `+${s.changePercent.toFixed(2)}%` : `${s.changePercent.toFixed(2)}%`}
+                      </td>
+                      <td className="py-3.5 text-right font-mono text-zinc-500 dark:text-zinc-400">
+                        {s.marketCap}
+                      </td>
+                      <td className="py-3.5 text-center pr-2">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => toggleFavorite(s.symbol)}
+                            title={s.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                            className={`p-1.5 border transition-colors ${
+                              s.isFavorite
+                                ? 'text-amber-500 border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20'
+                                : 'text-zinc-400 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white'
+                            }`}
+                          >
+                            <Star className={`w-3.5 h-3.5 ${s.isFavorite ? 'fill-current' : ''}`} />
+                          </button>
+                          <button
+                            onClick={() => onTradeClick && onTradeClick(s.symbol)}
+                            className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors"
+                          >
+                            Trade
+                          </button>
+                          <button
+                            onClick={() => handleRemoveStock(s.symbol)}
+                            title={`Remove ${s.symbol} from watchlist`}
+                            className="p-1.5 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:border-rose-300 dark:hover:border-rose-900/60 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
