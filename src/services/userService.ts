@@ -534,24 +534,33 @@ export class UserService {
     }
   }
 
+  private registrySyncTimer: any = null;
+
+  private scheduleRegistrySync() {
+    if (this.registrySyncTimer) clearTimeout(this.registrySyncTimer);
+    this.registrySyncTimer = setTimeout(() => {
+      try {
+        const user = this.activeUser;
+        if (!user) return;
+        const localUsers = this.getLocalUsers();
+        const idx = localUsers.findIndex(u => u.id === user.id);
+        if (idx >= 0) {
+          localUsers[idx] = user;
+          this.saveLocalUsers(localUsers);
+        }
+      } catch {
+        // ignore
+      }
+    }, 500);
+  }
+
   updateActiveUserData(updater: (prevData: UserAccount['data']) => Partial<UserAccount['data']>) {
     const user = this.getActiveUser();
     if (!user) return;
     const partial = updater(user.data);
     user.data = { ...user.data, ...partial };
     this.setActiveUser(user);
-
-    // Also update in local users registry
-    try {
-      const localUsers = this.getLocalUsers();
-      const idx = localUsers.findIndex(u => u.id === user.id);
-      if (idx >= 0) {
-        localUsers[idx] = user;
-        this.saveLocalUsers(localUsers);
-      }
-    } catch {
-      // ignore
-    }
+    this.scheduleRegistrySync();
   }
 
   updateActiveUserProfile(partialProfile: Partial<UserProfile>) {
@@ -559,18 +568,7 @@ export class UserService {
     if (!user) return;
     user.profile = { ...user.profile, ...partialProfile };
     this.setActiveUser(user);
-
-    // Also update in local users registry
-    try {
-      const localUsers = this.getLocalUsers();
-      const idx = localUsers.findIndex(u => u.id === user.id);
-      if (idx >= 0) {
-        localUsers[idx] = user;
-        this.saveLocalUsers(localUsers);
-      }
-    } catch {
-      // ignore
-    }
+    this.scheduleRegistrySync();
   }
 
   /**

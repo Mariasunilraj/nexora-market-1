@@ -291,28 +291,35 @@ export const TradingViewAdvancedChart: React.FC<TradingViewAdvancedChartProps> =
   const candleChange = +(activeCandle.close - activeCandle.open).toFixed(2);
   const candleChangePct = +((candleChange / (activeCandle.open || 1)) * 100).toFixed(2);
 
+  const rafRef = useRef<number | null>(null);
+
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     const clientX = e.clientX - rect.left;
     const clientY = e.clientY - rect.top;
     
-    const scaleX = svgWidth / rect.width;
-    const scaleY = svgHeight / rect.height;
-    const svgX = clientX * scaleX;
-    const svgY = clientY * scaleY;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
-    setMousePos({ x: svgX, y: svgY });
+    rafRef.current = requestAnimationFrame(() => {
+      const scaleX = svgWidth / rect.width;
+      const scaleY = svgHeight / rect.height;
+      const svgX = clientX * scaleX;
+      const svgY = clientY * scaleY;
 
-    const index = Math.floor((svgX - 20) / candleSpacing);
-    if (index >= 0 && index < displayedCandles.length) {
-      setHoveredIndex(index);
-    } else {
-      setHoveredIndex(null);
-    }
+      setMousePos({ x: svgX, y: svgY });
+
+      const index = Math.floor((svgX - 20) / candleSpacing);
+      if (index >= 0 && index < displayedCandles.length) {
+        setHoveredIndex(index);
+      } else {
+        setHoveredIndex(null);
+      }
+    });
   };
 
   const handleMouseLeave = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setHoveredIndex(null);
     setMousePos(null);
   };

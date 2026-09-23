@@ -180,19 +180,28 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [loadUserSession, refreshCloudData]);
 
-  // Always keep userDB active user in sync so page refresh retains all current changes
+  const stocksRef = useRef<StockQuote[]>(stocks);
   useEffect(() => {
-    const activeUser = userDB.getActiveUser();
-    if (!activeUser) return;
+    stocksRef.current = stocks;
+  }, [stocks]);
 
-    userDB.updateActiveUserData(() => ({
-      cash: virtualCash,
-      holdings,
-      orders,
-      transactions,
-      settings,
-      notifications,
-    }));
+  // Always keep userDB active user in sync (debounced to prevent UI thread lock during market ticks)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const activeUser = userDB.getActiveUser();
+      if (!activeUser) return;
+
+      userDB.updateActiveUserData(() => ({
+        cash: virtualCash,
+        holdings,
+        orders,
+        transactions,
+        settings,
+        notifications,
+      }));
+    }, 400);
+
+    return () => clearTimeout(timer);
   }, [virtualCash, holdings, orders, transactions, settings, notifications]);
 
   // Compute accurate Realized & Unrealized P&L
@@ -218,13 +227,13 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   
   const buyingPower = Math.max(0, virtualCash - reservedCash);
 
-  // Fetch Live Real-Time Quote from Finnhub API
+  // Fetch Live Real-Time Quote from Finnhub API (Stable zero-render-cascade)
   const fetchLiveQuote = useCallback(async (symbol: string): Promise<StockQuote | null> => {
     try {
       const quote = await finnhubClient.getQuote(symbol);
       if (quote && quote.c > 0) {
         setIsLiveApiConnected(true);
-        const existing = stocks.find(s => s.symbol.toUpperCase() === symbol.toUpperCase());
+        const existing = stocksRef.current.find(s => s.symbol.toUpperCase() === symbol.toUpperCase());
         const updatedPrice = quote.c;
         const change = quote.d;
         const changePercent = quote.dp;
@@ -262,8 +271,8 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (e) {
       console.warn(`Finnhub live fetch error for ${symbol}`, e);
     }
-    return stocks.find(s => s.symbol.toUpperCase() === symbol.toUpperCase()) || null;
-  }, [stocks]);
+    return stocksRef.current.find(s => s.symbol.toUpperCase() === symbol.toUpperCase()) || null;
+  }, []);
 
   // Refresh Top Stocks with real Finnhub quotes
   const refreshAllQuotes = useCallback(async () => {
@@ -273,17 +282,18 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [fetchLiveQuote]);
 
+  // Initial load runs only once on mount
   useEffect(() => {
     refreshAllQuotes();
   }, [refreshAllQuotes]);
 
-  // Periodic Finnhub update
+  // Smooth background quote updates every 15 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       const topSymbols = ['AAPL', 'MSFT', 'TSLA', 'NVDA', 'AMZN'];
       const target = topSymbols[Math.floor(Math.random() * topSymbols.length)];
       fetchLiveQuote(target);
-    }, 10000);
+    }, 15000);
 
     return () => clearInterval(timer);
   }, [fetchLiveQuote]);
